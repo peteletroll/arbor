@@ -316,7 +316,11 @@
         var topleft = null        
         
         $.each(active.particles, function(i, point) {
-
+          // really force fixed point to stay fixed, to combat center drift effects
+          if (point.fixed){
+             point.v = new Point(0,0);
+             point.f = new Point(0,0);
+          }
           // move the node to its new position
           if (that.integrator=='euler'){
             point.p = point.p.add(point.v.multiply(timestep));
