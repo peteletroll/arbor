@@ -9,7 +9,7 @@
     var len = arguments.length
     var args = []
     for (var i=0; i<len; i++) args.push("arguments["+i+"]")
-    eval("console.log("+args.join(",")+")")
+    console.log.apply(null, arguments)
   }  
 
   var dirname = function(path){
