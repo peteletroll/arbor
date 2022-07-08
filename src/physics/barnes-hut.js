@@ -58,6 +58,13 @@
             // slot contains a particle, create a new branch and recurse with
             // both points in the queue now
             var branch_size = node.size.divide(2)
+
+            // if we let a zero-sized node through, we'll end up infinitely bisecting it
+            // (the 'jostling' below depends upon branch_size being non-zero)
+            // -- this doesn't affect the forces applied: this node will always be treated
+            //    as a single body in applyForces below
+            if (branch_size.magnitude() == 0) return;
+
             var branch_origin = new Point(node.origin)
             if (p_quad[0]=='s') branch_origin.y += branch_size.y
             if (p_quad[1]=='e') branch_origin.x += branch_size.x
