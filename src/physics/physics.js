@@ -287,6 +287,7 @@
           if (point.fixed){
              point.v = new Point(0,0)
              point.f = new Point(0,0)
+             n++;
              return
           }
 

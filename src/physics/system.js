@@ -73,7 +73,7 @@
       },
 
       start:function(){
-        state.kernel.start()
+        state.kernel.start(true);
       },
 
       stop:function(){
