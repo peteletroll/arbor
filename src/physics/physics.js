@@ -221,6 +221,7 @@
       
       applyBarnesHutRepulsion:function(){
         if (!_bounds.topleft || !_bounds.bottomright) return
+        if (Object.keys(active.particles).length < 2) return
         var bottomright = new Point(_bounds.bottomright)
         var topleft = new Point(_bounds.topleft)
 
@@ -264,7 +265,7 @@
           numParticles++
         });
 
-        if (numParticles==0) return
+        if (numParticles < 2) return
         
         var correction = centroid.divide(-numParticles)
         $.each(active.particles, function(id, point) {
