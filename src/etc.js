@@ -150,7 +150,7 @@
       var src = $(this).attr('src')
       if (!src) return
       if (src.match(/arbor[^\/\.]*.js|dev.js/)){
-        return src.match(/.*\//) || "/"
+        return src.match(/.*\//) || "./"
       }
     })
 
