@@ -79,6 +79,9 @@
       stop:function(){
         state.kernel.stop()
       },
+      isRunning:function(){
+        return state.kernel.isRunning()
+      },
 
       addNode:function(name, data){
         data = data || {}

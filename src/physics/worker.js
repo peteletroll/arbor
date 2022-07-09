@@ -70,7 +70,7 @@ var PhysicsWorker = function(){
       if (_physicsInterval===null) return
       clearInterval(_physicsInterval);
       _physicsInterval = null;
-      // postMessage('stopping')
+      postMessage({type:'stopping'})
     },
     tick:function(){
       // iterate the system

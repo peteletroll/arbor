@@ -20,6 +20,7 @@
     var _tickInterval = null
     var _lastTick = null
     var _paused = false
+    var _running = false
     
     var that = {
       system:pSystem,
@@ -93,11 +94,15 @@
       },
       
       workerMsg:function(e){
-        var type = e.data.type
-        if (type=='geometry'){
-          that.workerUpdate(e.data)
-        }else{
-          trace('physics:',e.data)
+        switch (e.data.type) {
+          case 'geometry':
+            that.workerUpdate(e.data)
+            break
+          case 'stopping':
+            _running = false
+            break
+          default:
+            trace('physics:',e.data)
         }
       },
       _lastPositions:null,
@@ -179,6 +184,7 @@
             // trace('stopping')
             clearInterval(_tickInterval)
             _tickInterval = null
+            _running = false;
           }else{
             // trace('pausing')
           }
@@ -217,6 +223,8 @@
           _tickInterval = setInterval(that.physicsUpdate, 
                                       that.system.parameters().timeout)
         }
+
+        _running = true
       },
       stop:function(){
         _paused = true
@@ -228,10 +236,13 @@
             _tickInterval = null
           }
         }
-      
+
+        _running = false;
+      },
+      isRunning:function() {
+        return _running;
       }
     }
     
     return that.init()    
   }
-  
