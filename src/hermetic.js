@@ -44,5 +44,5 @@ $ = {
       isEmpty = false
     })
     return isEmpty
-  },
+  }
 }
