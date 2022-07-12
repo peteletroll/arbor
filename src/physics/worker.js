@@ -4,37 +4,11 @@
 // wraps physics.js in an onMessage/postMessage protocol that the
 // Kernel object can deal with
 //
+importScripts("../hermetic.js");
 importScripts('atoms.js');
 importScripts('barnes-hut.js');  
 importScripts('physics.js');  
-// alias over the missing jquery utils so we can run in a worker
-$ = {
-  each:function(obj, callback){
-    if ($.isArray(obj)){
-      for (var i=0, j=obj.length; i<j; i++) callback(i, obj[i])
-    }else{
-      for (var k in obj) callback(k, obj[k])
-    }
-  },
-  map:function(arr, fn){
-    var out = []
-    $.each(arr, function(i, elt){
-      var result = fn(elt, i)
-      if (result!==undefined) out.push(result)
-    })
-    return out
-  },
 
-  isArray:function(obj){
-    return (obj.constructor.toString().indexOf("Array") != -1)
-  },
-
-  inArray:function(elt, arr){
-    for (var i=0, j=arr.length; i<j; i++) if (arr[i]===elt) return i;
-    return -1
-  }    
-}
-// endalias
 var PhysicsWorker = function(){
   var _timeout = 20
   var _physics = null
