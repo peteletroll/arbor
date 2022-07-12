@@ -279,16 +279,18 @@
       },
       applyCenterGravity:function(){
         // attract each node to the origin
-        $.each(active.particles, function(id, point) {
+        for (id in active.particles) { // WAS-EACH
+          var point = active.particles[id];
           var direction = point.p.multiply(-1.0);
           point.applyForce(direction.multiply(that.repulsion / 100.0));
-        });
+        }
       },
       
       updateVelocity:function(timestep){
         // translate forces to a new velocity for this particle
         var sum=0, max=0, n = 0;
-        $.each(active.particles, function(id, point) {
+        for (id in active.particles) { // WAS-EACH
+          var point = active.particles[id];
           if (point.fixed){
              point.v = new Point(0,0)
              point.f = new Point(0,0)
@@ -311,7 +313,7 @@
           sum += e
           max = Math.max(e,max)
           n++
-        });
+        }
         _energy = {sum:sum, max:max, mean:sum/n, n:n}
         
       },
