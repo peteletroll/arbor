@@ -32,14 +32,5 @@ $ = {
     }
     
     return dst
-  },
-  isEmptyObject:function(obj){
-    console.log("HERMETIC isEmptyObject()");
-    if (typeof obj!=='object') return false
-    var isEmpty = true
-    $.each(obj, function(k, elt){
-      isEmpty = false
-    })
-    return isEmpty
   }
 }
