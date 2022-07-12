@@ -160,7 +160,8 @@
       },
 
       tendParticles:function(){
-        $.each(active.particles, function(id, pt){
+        for (id in active.particles) { // WAS-EACH
+          var pt = active.particles[id];
           // decay down any of the temporary mass increases that were passed along
           // by using an {_m:} instead of an {m:} (which is to say via a Node having
           // its .tempMass attr set)
@@ -175,7 +176,7 @@
 
           // zero out the velocity from one tick to the next
           pt.v.x = pt.v.y = 0           
-        })
+        }
 
       },
       
@@ -193,13 +194,15 @@
       
       cacheForces:function() {
         // keep a snapshot of the current forces for the verlet integrator
-        $.each(active.particles, function(id, point) {
+        for (id in active.particles) { // WAS-EACH
+           var point = active.particles[id];
            point._F = point.f;
-        });
+        }
       },
       
       applyBruteForceRepulsion:function(){
-        $.each(active.particles, function(id1, point1){
+        for (id1 in active.particles) { // WAS-EACH
+          var point1 = active.particles[id1];
           $.each(active.particles, function(id2, point2){
             if (point1 !== point2){
               var d = point1.p.subtract(point2.p);
@@ -217,7 +220,7 @@
 
             }
           })          
-        })
+        }
       },
       
       applyBarnesHutRepulsion:function(){
