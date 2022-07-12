@@ -70,7 +70,7 @@
       break
     }
 
-    var newObj = ($.isArray(old)) ? [] : {}
+    var newObj = (Array.isArray(old)) ? [] : {}
     $.each(old, function(ik, v){
       newObj[ik] = objcopy(v)
     })
@@ -95,8 +95,8 @@
       // a collection type
       
       // first compare buckets
-      if ($.isArray(a)){
-        if (!($.isArray(b))) return false
+      if (Array.isArray(a)){
+        if (!(Array.isArray(b))) return false
         if (a.length != b.length) return false
       }else{
         var a_keys = []; for (var k in a) if (a.hasOwnProperty(k)) a_keys.push(k)

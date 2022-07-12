@@ -8,7 +8,7 @@ $ = {
     if (Array.isArray(obj))
 	  throw "HERMETIC each(Array)";
     console.log("HERMETIC each(Object)");
-    if ($.isArray(obj)){
+    if (Array.isArray(obj)){
       for (var i=0, j=obj.length; i<j; i++) callback(i, obj[i])
     }else{
       for (var k in obj) callback(k, obj[k])
@@ -33,8 +33,6 @@ $ = {
     
     return dst
   },
-  isArray:Array.isArray,
-
   inArray:function(elt, arr){
     console.log("HERMETIC inArray()");
     for (var i=0, j=arr.length; i<j; i++) if (arr[i]===elt) return i;

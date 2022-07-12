@@ -135,7 +135,7 @@ var Primitives = function(ctx, _drawStyle, _fontStyle){
         // ƒ( x1, y1, x2, y2, <style> )
         this.points = [ {x:x1,y:y1}, {x:x2,y:y2} ]
         this.style = style || {}
-      }else if ($.isArray(x1)){
+      }else if (Array.isArray(x1)){
         // ƒ( [ {x:1, y:1}, {x:2, y:2}, ...], <style> )
         this.points = x1
         this.style = y1 || {}
@@ -150,7 +150,7 @@ var Primitives = function(ctx, _drawStyle, _fontStyle){
         if (this.points.length<2) return
 
         var sublines = []
-        if (!$.isArray(this.points[0])) sublines.push(this.points)
+        if (!Array.isArray(this.points[0])) sublines.push(this.points)
         else sublines = this.points
         
         ctx.save()

@@ -413,7 +413,7 @@
       },
 
       screenPadding:function(t,r,b,l){
-        if ($.isArray(t)) trbl = t
+        if (Array.isArray(t)) trbl = t
         else trbl = [t,r,b,l]
 
         var top = trbl[0]
