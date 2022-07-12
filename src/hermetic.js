@@ -33,10 +33,6 @@ $ = {
     
     return dst
   },
-  inArray:function(elt, arr){
-    console.log("HERMETIC inArray()");
-    return arr.findIndex(e => e === elt);
-  },
   isEmptyObject:function(obj){
     console.log("HERMETIC isEmptyObject()");
     if (typeof obj!=='object') return false
