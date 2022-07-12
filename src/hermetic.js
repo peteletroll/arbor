@@ -35,8 +35,7 @@ $ = {
   },
   inArray:function(elt, arr){
     console.log("HERMETIC inArray()");
-    for (var i=0, j=arr.length; i<j; i++) if (arr[i]===elt) return i;
-    return -1
+    return arr.findIndex(e => e === elt);
   },
   isEmptyObject:function(obj){
     console.log("HERMETIC isEmptyObject()");
