@@ -5,7 +5,9 @@
 //
 $ = {
   each:function(obj, callback){
-    console.log("HERMETIC each(" + (Array.isArray(obj) ? "arr" : "obj") + ")");
+    if (Array.isArray(obj))
+	  throw "HERMETIC each(Array)";
+    console.log("HERMETIC each(Object)");
     if ($.isArray(obj)){
       for (var i=0, j=obj.length; i<j; i++) callback(i, obj[i])
     }else{

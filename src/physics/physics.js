@@ -30,7 +30,7 @@
       },
 
       modifyPhysics:function(param){
-        $.each(['stiffness','repulsion','friction','gravity','dt','precision', 'integrator'], function(i, p){
+        ['stiffness','repulsion','friction','gravity','dt','precision', 'integrator'].forEach(function(p){
           if (param[p]!==undefined){
             if (p=='precision'){
               that.theta = 1-param[p]
@@ -124,7 +124,7 @@
         // batch changes phoned in (automatically) by a ParticleSystem
         _epoch++
         
-        $.each(changes, function(i, c){
+        changes.forEach(function(c){
           if (c.t in that) that[c.t](c)
         })
         return _epoch
