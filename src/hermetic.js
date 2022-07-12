@@ -22,15 +22,5 @@ $ = {
       if (result!==undefined) out.push(result)
     })
     return out
-  },
-  extend:function(dst, src){
-    console.log("HERMETIC extend()");
-    if (typeof src!='object') return dst
-    
-    for (var k in src){
-      if (src.hasOwnProperty(k)) dst[k] = src[k]
-    }
-    
-    return dst
   }
 }
