@@ -236,13 +236,14 @@
         }
         
         // ...and use it to approximate the repulsion forces
-        $.each(active.particles, function(id, particle){
-          bhTree.applyForces(particle, that.repulsion)
-        })
+        for (id in active.particles) { // WAS-EACH
+          bhTree.applyForces(active.particles[id], that.repulsion)
+        }
       },
       
       applySprings:function(){
-        $.each(active.springs, function(id, spring){
+        for (id in active.springs) { // WAS-EACH
+          var spring = active.springs[id];
           var d = spring.point2.p.subtract(spring.point1.p); // the direction of the spring
           var displacement = spring.length - d.magnitude()//Math.max(.1, d.magnitude());
           var direction = ( (d.magnitude()>0) ? d : Point.random(1) ).normalize()
@@ -255,7 +256,7 @@
           // apply force to each end point
           spring.point1.applyForce(direction.multiply(spring.k * displacement * -0.5))
           spring.point2.applyForce(direction.multiply(spring.k * displacement * 0.5))
-        });
+        }
       },
 
 
@@ -264,18 +265,17 @@
         // so the cloud is centered over the origin
         var numParticles = 0
         var centroid = new Point(0,0)
-        $.each(active.particles, function(id, point) {
-          centroid.add(point.p)
+        for (id in active.particles) { // WAS-EACH
+          centroid.add(active.particles[id].p)
           numParticles++
-        });
+        }
 
         if (numParticles < 2) return
         
         var correction = centroid.divide(-numParticles)
-        $.each(active.particles, function(id, point) {
-          point.applyForce(correction)
-        })
-        
+        for (id in active.particles) { // WAS-EACH
+          active.particles[id].applyForce(correction)
+        }
       },
       applyCenterGravity:function(){
         // attract each node to the origin
