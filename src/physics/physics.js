@@ -40,9 +40,9 @@
 
             if (p=='stiffness'){
               var stiff=param[p]
-              $.each(active.springs, function(id, spring){
-                spring.k = stiff
-              })             
+              for (id in active.springs) { // WAS-EACH
+                active.springs[id].k = stiff
+              }
             }
           }
         })
@@ -149,11 +149,12 @@
 
       tock:function(){
         var coords = []
-        $.each(active.particles, function(id, pt){
+        for (id in active.particles) { // WAS-EACH
+          var pt = active.particles[id];
           coords.push(id)
           coords.push(pt.p.x)
           coords.push(pt.p.y)
-        })
+        }
 
         if (updateFn) updateFn({geometry:coords, epoch:_epoch, energy:_energy, bounds:_bounds})
       },
