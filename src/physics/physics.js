@@ -203,7 +203,8 @@
       applyBruteForceRepulsion:function(){
         for (id1 in active.particles) { // WAS-EACH
           var point1 = active.particles[id1];
-          $.each(active.particles, function(id2, point2){
+          for (id2 in active.particles) { // WAS-EACH
+            var point2 = active.particles[id2];
             if (point1 !== point2){
               var d = point1.p.subtract(point2.p);
               var distance = Math.max(1.0, d.magnitude());
@@ -217,9 +218,8 @@
                                          .divide(distance * distance * 0.5) );
               point2.applyForce(direction.multiply(that.repulsion*(point1._m||point1.m)*.5)
                                          .divide(distance * distance * -0.5) );
-
             }
-          })          
+          }
         }
       },
       
@@ -231,9 +231,9 @@
 
         // build a barnes-hut tree...
         bhTree.init(topleft, bottomright, that.theta)        
-        $.each(active.particles, function(id, particle){
-          bhTree.insert(particle)
-        })
+        for (id in active.particles) { // WAS-EACH
+          bhTree.insert(active.particles[id]);
+        }
         
         // ...and use it to approximate the repulsion forces
         $.each(active.particles, function(id, particle){
