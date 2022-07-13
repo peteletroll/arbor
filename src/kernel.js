@@ -203,8 +203,8 @@
         
         var totInterv = 0
         for (var i=0, j=_fpsWindow.length; i<j; i++) totInterv+=_fpsWindow[i]
-        var meanIntev = totInterv/Math.max(1,_fpsWindow.length)
-        if (!isNaN(meanIntev)) return Math.round(1000/meanIntev)
+        var meanInterv = totInterv/Math.max(1,_fpsWindow.length)
+        if (!isNaN(meanInterv)) return 1000/meanInterv
         else return 0
       },
 
