@@ -324,7 +324,7 @@
         var topleft = null        
         
         for (i in active.particles) { // WAS-EACH
-          let point = active.particles[i];
+          var point = active.particles[i];
           // really force fixed point to stay fixed, to combat center drift effects
           if (point.fixed){
              point.v = new Point(0,0);
