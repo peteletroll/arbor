@@ -15,7 +15,7 @@ var PhysicsWorker = function(){
   var _lastTick = null
   
   var times = []
-  var last = new Date().valueOf()
+  var last = Date.now()
   
   var that = {  
     init:function(param){
@@ -53,8 +53,8 @@ var PhysicsWorker = function(){
       // but stop the simulation when energy of the system goes below a threshold
       var sysEnergy = _physics.systemEnergy()
       if ((sysEnergy.mean + sysEnergy.max)/2 < 0.05){
-        if (_lastTick===null) _lastTick=new Date().valueOf()
-        if (new Date().valueOf()-_lastTick>1000){
+        if (_lastTick===null) _lastTick=Date.now()
+        if (Date.now()-_lastTick>1000){
           that.stop()
         }else{
           // postMessage('pausing')

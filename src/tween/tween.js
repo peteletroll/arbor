@@ -20,7 +20,7 @@
       },
       
       to:function(node, dur, to){
-        var now = new Date().valueOf()
+        var now = Date.now()
         var seenFields = {}
 
         var tween = {from:{}, to:{}, colors:{}, node:node, t0:now, t1:now+dur*1000, dur:dur*1000}
@@ -100,7 +100,7 @@
         for (var k in _tweens){ empty=false; break}
         if (empty) return
         
-        var now = new Date().valueOf()
+        var now = Date.now()
         
         $.each(_tweens, function(id, tweens){
           var unprunedTweens = false
