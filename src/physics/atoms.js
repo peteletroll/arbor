@@ -54,11 +54,13 @@ Spring.prototype.distanceToParticle = function(point)
 };
 
 var Point = function(x, y){
-  if (x && x.hasOwnProperty('y')){
-    y = x.y; x=x.x;
+  if (y !== undefined) {
+    this.x = x;
+    this.y = y;
+  } else {
+    this.x = x.x;
+    this.y = x.y;
   }
-  this.x = x;
-  this.y = y;  
 }
 
 Point.random = function(radius){
