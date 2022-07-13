@@ -68,7 +68,7 @@
       dropNode:function(c){
         var id = c.id
         var dropping = active.particles[id]
-        var idx = particles.findIndex(e => e === dropping);
+        var idx = particles.findIndex(function(e) { return e === dropping });
         if (idx>-1) particles.splice(idx,1)
         delete active.particles[id]
         delete free.particles[id]
@@ -113,7 +113,7 @@
         dropping.point1.connections--
         dropping.point2.connections--
         
-        var idx = springs.findIndex(e => e === dropping);
+        var idx = springs.findIndex(function(e) { return e === dropping });
         if (idx>-1){
            springs.splice(idx,1)
         }
