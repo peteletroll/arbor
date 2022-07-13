@@ -323,7 +323,8 @@
         var bottomright = null
         var topleft = null        
         
-        $.each(active.particles, function(i, point) {
+        for (i in active.particles) { // WAS-EACH
+          let point = active.particles[i];
           // really force fixed point to stay fixed, to combat center drift effects
           if (point.fixed){
              point.v = new Point(0,0);
@@ -342,7 +343,7 @@
           if (!bottomright){
             bottomright = new Point(point.p.x, point.p.y)
             topleft = new Point(point.p.x, point.p.y)
-            return
+            continue
           }
         
           var pt = point.p
@@ -351,7 +352,7 @@
           if (pt.y > bottomright.y) bottomright.y = pt.y;          
           if (pt.x < topleft.x)     topleft.x = pt.x;
           if (pt.y < topleft.y)     topleft.y = pt.y;
-        });
+        }
         
         _bounds = {topleft:topleft||new Point(-1,-1), bottomright:bottomright||new Point(1,1)}
       },
