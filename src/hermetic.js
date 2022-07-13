@@ -4,10 +4,4 @@
 // the parts of jquery i can't live without (e.g., while in a web worker)
 //
 $ = {
-  each:function(obj, callback){
-    if (Array.isArray(obj))
-	  throw "HERMETIC each(Array)";
-    // console.log("HERMETIC each(Object)");
-    for (var k in obj) callback(k, obj[k])
-  }
 }
