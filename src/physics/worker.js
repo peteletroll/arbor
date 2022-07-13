@@ -4,7 +4,6 @@
 // wraps physics.js in an onMessage/postMessage protocol that the
 // Kernel object can deal with
 //
-importScripts("../hermetic.js");
 importScripts('atoms.js');
 importScripts('barnes-hut.js');  
 importScripts('physics.js');  

@@ -49,7 +49,7 @@ def make_lib():
   for target,deps in targets.items():
     print target
 
-    padding = max(len(os.path.basename(fn)) for fn in deps + (['worker.js','hermetic.js'] if 'kernel.js' in deps else []))
+    padding = max(len(os.path.basename(fn)) for fn in deps + (['worker.js'] if 'kernel.js' in deps else []))
 
     all_src = dict( (fn, compile("src/%s"%fn,fn,padding)) for fn in deps)
     deps_code = "\n".join(all_src[fn] for fn in deps)
@@ -72,9 +72,8 @@ def make_worker(deps, padding):
 
   driver = re.sub(r'importScripts\(.*?\).*?\n','', driver)
   worker_code = compile(driver, 'worker.js', padding)
-  hermetic_code = compile('src/hermetic.js', padding)
   
-  return worker_code, hermetic_code
+  return worker_code, ""
       
 def render_file(target, **_vals):
 
