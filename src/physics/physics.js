@@ -40,7 +40,7 @@
 
             if (p=='stiffness'){
               var stiff=param[p]
-              for (id in active.springs) { // WAS-EACH
+              for (id in active.springs) {
                 active.springs[id].k = stiff
               }
             }
@@ -149,7 +149,7 @@
 
       tock:function(){
         var coords = []
-        for (id in active.particles) { // WAS-EACH
+        for (id in active.particles) {
           var pt = active.particles[id];
           coords.push(id)
           coords.push(pt.p.x)
@@ -160,7 +160,7 @@
       },
 
       tendParticles:function(){
-        for (id in active.particles) { // WAS-EACH
+        for (id in active.particles) {
           var pt = active.particles[id];
           // decay down any of the temporary mass increases that were passed along
           // by using an {_m:} instead of an {m:} (which is to say via a Node having
@@ -194,16 +194,16 @@
       
       cacheForces:function() {
         // keep a snapshot of the current forces for the verlet integrator
-        for (id in active.particles) { // WAS-EACH
+        for (id in active.particles) {
            var point = active.particles[id];
            point._F = point.f;
         }
       },
       
       applyBruteForceRepulsion:function(){
-        for (id1 in active.particles) { // WAS-EACH
+        for (id1 in active.particles) {
           var point1 = active.particles[id1];
-          for (id2 in active.particles) { // WAS-EACH
+          for (id2 in active.particles) {
             var point2 = active.particles[id2];
             if (point1 !== point2){
               var d = point1.p.subtract(point2.p);
@@ -231,18 +231,18 @@
 
         // build a barnes-hut tree...
         bhTree.init(topleft, bottomright, that.theta)        
-        for (id in active.particles) { // WAS-EACH
+        for (id in active.particles) {
           bhTree.insert(active.particles[id]);
         }
         
         // ...and use it to approximate the repulsion forces
-        for (id in active.particles) { // WAS-EACH
+        for (id in active.particles) {
           bhTree.applyForces(active.particles[id], that.repulsion)
         }
       },
       
       applySprings:function(){
-        for (id in active.springs) { // WAS-EACH
+        for (id in active.springs) {
           var spring = active.springs[id];
           var d = spring.point2.p.subtract(spring.point1.p); // the direction of the spring
           var displacement = spring.length - d.magnitude()//Math.max(.1, d.magnitude());
@@ -265,7 +265,7 @@
         // so the cloud is centered over the origin
         var numParticles = 0
         var centroid = new Point(0,0)
-        for (id in active.particles) { // WAS-EACH
+        for (id in active.particles) {
           centroid.add(active.particles[id].p)
           numParticles++
         }
@@ -273,13 +273,13 @@
         if (numParticles < 2) return
         
         var correction = centroid.divide(-numParticles)
-        for (id in active.particles) { // WAS-EACH
+        for (id in active.particles) {
           active.particles[id].applyForce(correction)
         }
       },
       applyCenterGravity:function(){
         // attract each node to the origin
-        for (id in active.particles) { // WAS-EACH
+        for (id in active.particles) {
           var point = active.particles[id];
           var direction = point.p.multiply(-1.0);
           point.applyForce(direction.multiply(that.repulsion / 100.0));
@@ -289,7 +289,7 @@
       updateVelocity:function(timestep){
         // translate forces to a new velocity for this particle
         var sum=0, max=0, n = 0;
-        for (id in active.particles) { // WAS-EACH
+        for (id in active.particles) {
           var point = active.particles[id];
           if (point.fixed){
              point.v = new Point(0,0)
@@ -323,7 +323,7 @@
         var bottomright = null
         var topleft = null        
         
-        for (i in active.particles) { // WAS-EACH
+        for (i in active.particles) {
           var point = active.particles[i];
           // really force fixed point to stay fixed, to combat center drift effects
           if (point.fixed){
