@@ -295,7 +295,7 @@
              point.v = new Point(0,0)
              point.f = new Point(0,0)
              n++;
-             return
+             continue
           }
 
           if (that.integrator=='euler'){
