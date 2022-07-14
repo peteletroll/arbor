@@ -144,11 +144,12 @@
 
       eachNode:function(callback){
         // callback should accept two arguments: Node, Point
-        $.each(state.nodes, function(id, n){
-          if (n._p.x==null || n._p.y==null) return
+        for (id in state.nodes) { // WAS-EACH
+          var n = state.nodes[id];
+          if (n._p.x==null || n._p.y==null) continue
           var pt = (_screenSize!==null) ? that.toScreen(n._p) : n._p
           callback.call(that, n, pt);
-        })
+        }
       },
 
       addEdge:function(source, target, data){
@@ -246,18 +247,19 @@
 
       eachEdge:function(callback){
         // callback should accept two arguments: Edge, Point
-        $.each(state.edges, function(id, e){
+        for (id in state.edges) { // WAS-EACH
+          var e = state.edges[id];
           var p1 = state.nodes[e.source._id]._p
           var p2 = state.nodes[e.target._id]._p
 
 
-          if (p1.x==null || p2.x==null) return
+          if (p1.x==null || p2.x==null) continue
           
           p1 = (_screenSize!==null) ? that.toScreen(p1) : p1
           p2 = (_screenSize!==null) ? that.toScreen(p2) : p2
           
           if (p1 && p2) callback.call(that, e, p1, p2);
-        })
+        }
       },
 
 
@@ -520,20 +522,21 @@
         var topleft = null
 
         // find the true x/y range of the nodes
-        $.each(state.nodes, function(id, node){
+        for (id in state.nodes) { // WAS-EACH
+          var node = state.nodes[id];
           if (!bottomright){
             bottomright = new Point(node._p)
             topleft = new Point(node._p)
-            return
+            continue
           }
         
           var point = node._p
-          if (point.x===null || point.y===null) return
+          if (point.x===null || point.y===null) continue
           if (point.x > bottomright.x) bottomright.x = point.x;
           if (point.y > bottomright.y) bottomright.y = point.y;          
           if   (point.x < topleft.x)   topleft.x = point.x;
           if   (point.y < topleft.y)   topleft.y = point.y;
-        })
+        }
 
 
         // return the true range then let to/fromScreen handle the padding
@@ -553,15 +556,16 @@
         var min = {node: null, point: null, distance: null};
         var t = that;
         
-        $.each(state.nodes, function(id, node){
+        for (id in state.nodes) { // WAS-EACH
+          var node = state.nodes[id];
           var pt = node._p
-          if (pt.x===null || pt.y===null) return
+          if (pt.x===null || pt.y===null) continue
           var distance = pt.subtract(pos).magnitude();
           if (min.distance === null || distance < min.distance){
             min = {node: node, point: pt, distance: distance};
             if (_screenSize!==null) min.screenPoint = that.toScreen(pt)
           }
-        })
+        }
         
         if (min.node){
           if (_screenSize!==null) min.distance = that.toScreen(min.node.p).subtract(that.toScreen(pos)).magnitude()
