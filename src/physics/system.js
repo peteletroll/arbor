@@ -289,7 +289,8 @@
         //                          edges:{fromNm:{toNm1:{d}, toNm2:{d}}, ...} }
 
         var changes = {added:{nodes:[], edges:[]}}
-        if (branch.nodes) $.each(branch.nodes, function(name, nodeData){
+        if (branch.nodes) for (name in branch.nodes) { // WAS-EACH
+          var nodeData = branch.nodes[name];
           var oldNode = that.getNode(name)
           // should probably merge any x/y/m data as well...
           // if (oldNode) $.extend(oldNode.data, nodeData)
@@ -298,7 +299,7 @@
           else changes.added.nodes.push( that.addNode(name, nodeData) )
           
           state.kernel.start()
-        })
+        }
         
         if (branch.edges) $.each(branch.edges, function(src, dsts){
           var srcNode = that.getNode(src)
@@ -333,14 +334,15 @@
       merge:function(branch){
         var changes = {added:{nodes:[], edges:[]}, dropped:{nodes:[], edges:[]}}
 
-        $.each(state.edges, function(id, edge){
+        for (id in state.edges) { // WAS-EACH
+          var edge = state.edges[id];
           // if ((branch.edges[edge.source.name]===undefined || branch.edges[edge.source.name][edge.target.name]===undefined) &&
           //     (branch.edges[edge.target.name]===undefined || branch.edges[edge.target.name][edge.source.name]===undefined)){
           if ((branch.edges[edge.source.name]===undefined || branch.edges[edge.source.name][edge.target.name]===undefined)){
                 that.pruneEdge(edge)
                 changes.dropped.edges.push(edge)
               }
-        })
+        }
         
         var prune_changes = that.prune(function(node, edges){
           if (branch.nodes[node.name] === undefined){
