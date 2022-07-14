@@ -266,10 +266,11 @@
 
         var changes = {dropped:{nodes:[], edges:[]}}
         if (callback===undefined){
-          $.each(state.nodes, function(id, node){
+          for (id in state.nodes) { // WAS-EACH
+            var node = state.nodes[id];
             changes.dropped.nodes.push(node)
             that.pruneNode(node)
-          })
+          }
         }else{
           that.eachNode(function(node){
             var drop = callback.call(that, node, {from:that.getEdgesFrom(node), to:that.getEdgesTo(node)})
@@ -370,9 +371,9 @@
         }else{
           // called with (node1, node2, dur, to)
           var edges = that.getEdges(a,b)
-          $.each(edges, function(i, edge){
-            that._tweenEdge(edge, c, d)    
-          })
+          for (i in edges) { // WAS-EACH
+            that._tweenEdge(edges[i], c, d)
+          }
         }
       },
 
