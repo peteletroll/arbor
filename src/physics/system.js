@@ -303,7 +303,8 @@
           state.kernel.start()
         }
         
-        if (branch.edges) $.each(branch.edges, function(src, dsts){
+        if (branch.edges) for (src in branch.edges) { // WAS-EACH
+          var dsts = branch.edges[src];
           var srcNode = that.getNode(src)
           if (!srcNode) changes.added.nodes.push( that.addNode(src, {}) )
 
@@ -327,7 +328,7 @@
               changes.added.edges.push( that.addEdge(src, dst, edgeData) )
             }
           }
-        })
+        }
 
         // trace('graft', changes.added)
         return changes
