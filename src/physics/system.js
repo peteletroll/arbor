@@ -307,8 +307,8 @@
           var srcNode = that.getNode(src)
           if (!srcNode) changes.added.nodes.push( that.addNode(src, {}) )
 
-          $.each(dsts, function(dst, edgeData){
-
+          for (dst in dsts) { // WAS-EACH
+            var edgeData = dsts[dst];
             // should probably merge any x/y/m data as well...
             // if (srcNode) $.extend(srcNode.data, nodeData)
 
@@ -326,7 +326,7 @@
             // trace("new ->",src,dst)
               changes.added.edges.push( that.addEdge(src, dst, edgeData) )
             }
-          })
+          }
         })
 
         // trace('graft', changes.added)
