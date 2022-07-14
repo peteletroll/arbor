@@ -147,7 +147,7 @@
         // callback should accept two arguments: Node, Point
         for (id in state.nodes) { // WAS-EACH
           let n = state.nodes[id];
-          if (n._p.x==null || n._p.y==null) return
+          if (n._p.x==null || n._p.y==null) continue
           var pt = (_screenSize!==null) ? that.toScreen(n._p) : n._p
           callback.call(that, n, pt);
         }
@@ -223,9 +223,10 @@
         
         if (typeof(state.adjacency[node._id]) !== 'undefined'){
           var nodeEdges = []
-          $.each(state.adjacency[node._id], function(id, subEdges){
+          for (id in state.adjacency[node._id]) { // WAS-EACH
+            let subEdges = state.adjacency[node._id][id];
             nodeEdges = nodeEdges.concat(subEdges)
-          })
+          }
           return nodeEdges
         }
 
@@ -247,18 +248,19 @@
 
       eachEdge:function(callback){
         // callback should accept two arguments: Edge, Point
-        $.each(state.edges, function(id, e){
+        for (id in state.edges) { // WAS-EACH
+          let e = state.edges[id];
           var p1 = state.nodes[e.source._id]._p
           var p2 = state.nodes[e.target._id]._p
 
 
-          if (p1.x==null || p2.x==null) return
+          if (p1.x==null || p2.x==null) continue
           
           p1 = (_screenSize!==null) ? that.toScreen(p1) : p1
           p2 = (_screenSize!==null) ? that.toScreen(p2) : p2
           
           if (p1 && p2) callback.call(that, e, p1, p2);
-        })
+        }
       },
 
 
@@ -267,10 +269,11 @@
 
         var changes = {dropped:{nodes:[], edges:[]}}
         if (callback===undefined){
-          $.each(state.nodes, function(id, node){
+          for (id in state.nodes) { // WAS-EACH
+            let node = state.nodes[id];
             changes.dropped.nodes.push(node)
             that.pruneNode(node)
-          })
+          }
         }else{
           that.eachNode(function(node){
             var drop = callback.call(that, node, {from:that.getEdgesFrom(node), to:that.getEdgesTo(node)})
