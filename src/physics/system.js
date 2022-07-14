@@ -59,9 +59,9 @@
           if (!isNaN(newParams.precision)){
             newParams.precision = Math.max(0, Math.min(1, newParams.precision))
           }
-          $.each(_parameters, function(p, v){
+          for (p in _parameters) { // WAS-EACH
             if (newParams[p]!==undefined) _parameters[p] = newParams[p]
-          })
+          }
           state.kernel.physicsModified(newParams)
         }
         return _parameters
@@ -122,11 +122,12 @@
         }
 
 
-        $.each(state.edges, function(id, e){
+        for (id in state.edges) { // WAS-EACH
+          var e = state.edges[id];
           if (e.source._id === node._id || e.target._id === node._id){
             that.pruneEdge(e);
           }
-        })
+        }
 
         _changes.push({t:"dropNode", id:node._id})
         that._notify();
@@ -220,9 +221,10 @@
         
         if (typeof(state.adjacency[node._id]) !== 'undefined'){
           var nodeEdges = []
-          $.each(state.adjacency[node._id], function(id, subEdges){
+          for (id in state.adjacency[node._id]) { // WAS-EACH
+            var subEdges = state.adjacency[node._id][id];
             nodeEdges = nodeEdges.concat(subEdges)
-          })
+          }
           return nodeEdges
         }
 
@@ -234,9 +236,10 @@
         if (!node) return []
 
         var nodeEdges = []
-        $.each(state.edges, function(edgeId, edge){
+        for (edgeId in state.edges) { // WAS-EACH
+          var edge = state.edges[edgeId];
           if (edge.target == node) nodeEdges.push(edge)
-        })
+        }
         
         return nodeEdges;
       },
