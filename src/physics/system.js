@@ -59,9 +59,10 @@
           if (!isNaN(newParams.precision)){
             newParams.precision = Math.max(0, Math.min(1, newParams.precision))
           }
-          $.each(_parameters, function(p, v){
+          for (p in _parameters) { // WAS-EACH
+            let v = _parameters[p];
             if (newParams[p]!==undefined) _parameters[p] = newParams[p]
-          })
+          }
           state.kernel.physicsModified(newParams)
         }
         return _parameters
@@ -122,11 +123,12 @@
         }
 
 
-        $.each(state.edges, function(id, e){
+        for (id in state.edges) { // WAS-EACH
+          let e = state.edges[id];
           if (e.source._id === node._id || e.target._id === node._id){
             that.pruneEdge(e);
           }
-        })
+        }
 
         _changes.push({t:"dropNode", id:node._id})
         that._notify();
@@ -143,11 +145,12 @@
 
       eachNode:function(callback){
         // callback should accept two arguments: Node, Point
-        $.each(state.nodes, function(id, n){
+        for (id in state.nodes) { // WAS-EACH
+          let n = state.nodes[id];
           if (n._p.x==null || n._p.y==null) return
           var pt = (_screenSize!==null) ? that.toScreen(n._p) : n._p
           callback.call(that, n, pt);
-        })
+        }
       },
 
       addEdge:function(source, target, data){
@@ -234,9 +237,10 @@
         if (!node) return []
 
         var nodeEdges = []
-        $.each(state.edges, function(edgeId, edge){
+        for (edgeId in state.edges) { // WAS-EACH
+          let edge = state.edges[edgeId];
           if (edge.target == node) nodeEdges.push(edge)
-        })
+        }
         
         return nodeEdges;
       },
