@@ -118,8 +118,6 @@
       _lastBounds:null,
       _currentRenderer:null,
       screenUpdate:function(){        
-        var now = Date.now()
-        
         var shouldRedraw = false
         if (that._lastPositions!==null){
           that.system._updateGeometry(that._lastPositions)
