@@ -489,7 +489,7 @@
         _boundsTarget.bottomright = center.add(size.divide(2))
 
         if (!_bounds){
-          if ($.isEmptyObject(state.nodes)) return false
+          if (Object.keys(state.nodes).length <= 0) return false
           _bounds = _boundsTarget
           return true
         }
