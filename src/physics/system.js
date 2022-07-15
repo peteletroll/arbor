@@ -167,7 +167,7 @@
         if (exists){
           // probably shouldn't allow multiple edges in same direction
           // between same nodes? for now just overwriting the data...
-          $.extend(state.adjacency[src][dst].data, edge.data)
+          Object.assign(state.adjacency[src][dst].data, edge.data)
           return
         }else{
           state.edges[edge._id] = edge
