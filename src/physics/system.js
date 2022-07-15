@@ -59,9 +59,9 @@
           if (!isNaN(newParams.precision)){
             newParams.precision = Math.max(0, Math.min(1, newParams.precision))
           }
-          $.each(_parameters, function(p, v){
+          for (var p in _parameters) { // WAS-EACH
             if (newParams[p]!==undefined) _parameters[p] = newParams[p]
-          })
+          }
           state.kernel.physicsModified(newParams)
         }
         return _parameters
@@ -122,11 +122,12 @@
         }
 
 
-        $.each(state.edges, function(id, e){
+        for (var id in state.edges) { // WAS-EACH
+          var e = state.edges[id];
           if (e.source._id === node._id || e.target._id === node._id){
             that.pruneEdge(e);
           }
-        })
+        }
 
         _changes.push({t:"dropNode", id:node._id})
         that._notify();
@@ -143,11 +144,12 @@
 
       eachNode:function(callback){
         // callback should accept two arguments: Node, Point
-        $.each(state.nodes, function(id, n){
-          if (n._p.x==null || n._p.y==null) return
+        for (var id in state.nodes) { // WAS-EACH
+          var n = state.nodes[id];
+          if (n._p.x==null || n._p.y==null) continue
           var pt = (_screenSize!==null) ? that.toScreen(n._p) : n._p
           callback.call(that, n, pt);
-        })
+        }
       },
 
       addEdge:function(source, target, data){
@@ -165,7 +167,7 @@
         if (exists){
           // probably shouldn't allow multiple edges in same direction
           // between same nodes? for now just overwriting the data...
-          $.extend(state.adjacency[src][dst].data, edge.data)
+          Object.assign(state.adjacency[src][dst].data, edge.data)
           return
         }else{
           state.edges[edge._id] = edge
@@ -220,9 +222,10 @@
         
         if (typeof(state.adjacency[node._id]) !== 'undefined'){
           var nodeEdges = []
-          $.each(state.adjacency[node._id], function(id, subEdges){
+          for (var id in state.adjacency[node._id]) { // WAS-EACH
+            var subEdges = state.adjacency[node._id][id];
             nodeEdges = nodeEdges.concat(subEdges)
-          })
+          }
           return nodeEdges
         }
 
@@ -234,27 +237,29 @@
         if (!node) return []
 
         var nodeEdges = []
-        $.each(state.edges, function(edgeId, edge){
+        for (var edgeId in state.edges) { // WAS-EACH
+          var edge = state.edges[edgeId];
           if (edge.target == node) nodeEdges.push(edge)
-        })
+        }
         
         return nodeEdges;
       },
 
       eachEdge:function(callback){
         // callback should accept two arguments: Edge, Point
-        $.each(state.edges, function(id, e){
+        for (var id in state.edges) { // WAS-EACH
+          var e = state.edges[id];
           var p1 = state.nodes[e.source._id]._p
           var p2 = state.nodes[e.target._id]._p
 
 
-          if (p1.x==null || p2.x==null) return
+          if (p1.x==null || p2.x==null) continue
           
           p1 = (_screenSize!==null) ? that.toScreen(p1) : p1
           p2 = (_screenSize!==null) ? that.toScreen(p2) : p2
           
           if (p1 && p2) callback.call(that, e, p1, p2);
-        })
+        }
       },
 
 
@@ -263,10 +268,11 @@
 
         var changes = {dropped:{nodes:[], edges:[]}}
         if (callback===undefined){
-          $.each(state.nodes, function(id, node){
+          for (var id in state.nodes) { // WAS-EACH
+            var node = state.nodes[id];
             changes.dropped.nodes.push(node)
             that.pruneNode(node)
-          })
+          }
         }else{
           that.eachNode(function(node){
             var drop = callback.call(that, node, {from:that.getEdgesFrom(node), to:that.getEdgesTo(node)})
@@ -285,7 +291,8 @@
         //                          edges:{fromNm:{toNm1:{d}, toNm2:{d}}, ...} }
 
         var changes = {added:{nodes:[], edges:[]}}
-        if (branch.nodes) $.each(branch.nodes, function(name, nodeData){
+        if (branch.nodes) for (var name in branch.nodes) { // WAS-EACH
+          var nodeData = branch.nodes[name];
           var oldNode = that.getNode(name)
           // should probably merge any x/y/m data as well...
           // if (oldNode) $.extend(oldNode.data, nodeData)
@@ -294,14 +301,15 @@
           else changes.added.nodes.push( that.addNode(name, nodeData) )
           
           state.kernel.start()
-        })
+        }
         
-        if (branch.edges) $.each(branch.edges, function(src, dsts){
+        if (branch.edges) for (var src in branch.edges) { // WAS-EACH
+          var dsts = branch.edges[src];
           var srcNode = that.getNode(src)
           if (!srcNode) changes.added.nodes.push( that.addNode(src, {}) )
 
-          $.each(dsts, function(dst, edgeData){
-
+          for (var dst in dsts) { // WAS-EACH
+            var edgeData = dsts[dst];
             // should probably merge any x/y/m data as well...
             // if (srcNode) $.extend(srcNode.data, nodeData)
 
@@ -319,8 +327,8 @@
             // trace("new ->",src,dst)
               changes.added.edges.push( that.addEdge(src, dst, edgeData) )
             }
-          })
-        })
+          }
+        }
 
         // trace('graft', changes.added)
         return changes
@@ -329,14 +337,15 @@
       merge:function(branch){
         var changes = {added:{nodes:[], edges:[]}, dropped:{nodes:[], edges:[]}}
 
-        $.each(state.edges, function(id, edge){
+        for (var id in state.edges) { // WAS-EACH
+          var edge = state.edges[id];
           // if ((branch.edges[edge.source.name]===undefined || branch.edges[edge.source.name][edge.target.name]===undefined) &&
           //     (branch.edges[edge.target.name]===undefined || branch.edges[edge.target.name][edge.source.name]===undefined)){
           if ((branch.edges[edge.source.name]===undefined || branch.edges[edge.source.name][edge.target.name]===undefined)){
                 that.pruneEdge(edge)
                 changes.dropped.edges.push(edge)
               }
-        })
+        }
         
         var prune_changes = that.prune(function(node, edges){
           if (branch.nodes[node.name] === undefined){
@@ -367,9 +376,9 @@
         }else{
           // called with (node1, node2, dur, to)
           var edges = that.getEdges(a,b)
-          $.each(edges, function(i, edge){
-            that._tweenEdge(edge, c, d)    
-          })
+          for (var i in edges) { // WAS-EACH
+            that._tweenEdge(edges[i], c, d)
+          }
         }
       },
 
@@ -480,7 +489,7 @@
         _boundsTarget.bottomright = center.add(size.divide(2))
 
         if (!_bounds){
-          if ($.isEmptyObject(state.nodes)) return false
+          if (Object.keys(state.nodes).length <= 0) return false
           _bounds = _boundsTarget
           return true
         }
@@ -514,20 +523,21 @@
         var topleft = null
 
         // find the true x/y range of the nodes
-        $.each(state.nodes, function(id, node){
+        for (var id in state.nodes) { // WAS-EACH
+          var node = state.nodes[id];
           if (!bottomright){
             bottomright = new Point(node._p)
             topleft = new Point(node._p)
-            return
+            continue
           }
         
           var point = node._p
-          if (point.x===null || point.y===null) return
+          if (point.x===null || point.y===null) continue
           if (point.x > bottomright.x) bottomright.x = point.x;
           if (point.y > bottomright.y) bottomright.y = point.y;          
           if   (point.x < topleft.x)   topleft.x = point.x;
           if   (point.y < topleft.y)   topleft.y = point.y;
-        })
+        }
 
 
         // return the true range then let to/fromScreen handle the padding
@@ -547,15 +557,16 @@
         var min = {node: null, point: null, distance: null};
         var t = that;
         
-        $.each(state.nodes, function(id, node){
+        for (var id in state.nodes) { // WAS-EACH
+          var node = state.nodes[id];
           var pt = node._p
-          if (pt.x===null || pt.y===null) return
+          if (pt.x===null || pt.y===null) continue
           var distance = pt.subtract(pos).magnitude();
           if (min.distance === null || distance < min.distance){
             min = {node: node, point: pt, distance: distance};
             if (_screenSize!==null) min.screenPoint = that.toScreen(pt)
           }
-        })
+        }
         
         if (min.node){
           if (_screenSize!==null) min.distance = that.toScreen(min.node.p).subtract(that.toScreen(pos)).magnitude()
