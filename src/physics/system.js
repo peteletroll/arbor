@@ -59,7 +59,7 @@
           if (!isNaN(newParams.precision)){
             newParams.precision = Math.max(0, Math.min(1, newParams.precision))
           }
-          for (p in _parameters) { // WAS-EACH
+          for (var p in _parameters) { // WAS-EACH
             if (newParams[p]!==undefined) _parameters[p] = newParams[p]
           }
           state.kernel.physicsModified(newParams)
@@ -122,7 +122,7 @@
         }
 
 
-        for (id in state.edges) { // WAS-EACH
+        for (var id in state.edges) { // WAS-EACH
           var e = state.edges[id];
           if (e.source._id === node._id || e.target._id === node._id){
             that.pruneEdge(e);
@@ -144,7 +144,7 @@
 
       eachNode:function(callback){
         // callback should accept two arguments: Node, Point
-        for (id in state.nodes) { // WAS-EACH
+        for (var id in state.nodes) { // WAS-EACH
           var n = state.nodes[id];
           if (n._p.x==null || n._p.y==null) continue
           var pt = (_screenSize!==null) ? that.toScreen(n._p) : n._p
@@ -222,7 +222,7 @@
         
         if (typeof(state.adjacency[node._id]) !== 'undefined'){
           var nodeEdges = []
-          for (id in state.adjacency[node._id]) { // WAS-EACH
+          for (var id in state.adjacency[node._id]) { // WAS-EACH
             var subEdges = state.adjacency[node._id][id];
             nodeEdges = nodeEdges.concat(subEdges)
           }
@@ -237,7 +237,7 @@
         if (!node) return []
 
         var nodeEdges = []
-        for (edgeId in state.edges) { // WAS-EACH
+        for (var edgeId in state.edges) { // WAS-EACH
           var edge = state.edges[edgeId];
           if (edge.target == node) nodeEdges.push(edge)
         }
@@ -247,7 +247,7 @@
 
       eachEdge:function(callback){
         // callback should accept two arguments: Edge, Point
-        for (id in state.edges) { // WAS-EACH
+        for (var id in state.edges) { // WAS-EACH
           var e = state.edges[id];
           var p1 = state.nodes[e.source._id]._p
           var p2 = state.nodes[e.target._id]._p
@@ -268,7 +268,7 @@
 
         var changes = {dropped:{nodes:[], edges:[]}}
         if (callback===undefined){
-          for (id in state.nodes) { // WAS-EACH
+          for (var id in state.nodes) { // WAS-EACH
             var node = state.nodes[id];
             changes.dropped.nodes.push(node)
             that.pruneNode(node)
@@ -291,7 +291,7 @@
         //                          edges:{fromNm:{toNm1:{d}, toNm2:{d}}, ...} }
 
         var changes = {added:{nodes:[], edges:[]}}
-        if (branch.nodes) for (name in branch.nodes) { // WAS-EACH
+        if (branch.nodes) for (var name in branch.nodes) { // WAS-EACH
           var nodeData = branch.nodes[name];
           var oldNode = that.getNode(name)
           // should probably merge any x/y/m data as well...
@@ -303,12 +303,12 @@
           state.kernel.start()
         }
         
-        if (branch.edges) for (src in branch.edges) { // WAS-EACH
+        if (branch.edges) for (var src in branch.edges) { // WAS-EACH
           var dsts = branch.edges[src];
           var srcNode = that.getNode(src)
           if (!srcNode) changes.added.nodes.push( that.addNode(src, {}) )
 
-          for (dst in dsts) { // WAS-EACH
+          for (var dst in dsts) { // WAS-EACH
             var edgeData = dsts[dst];
             // should probably merge any x/y/m data as well...
             // if (srcNode) $.extend(srcNode.data, nodeData)
@@ -337,7 +337,7 @@
       merge:function(branch){
         var changes = {added:{nodes:[], edges:[]}, dropped:{nodes:[], edges:[]}}
 
-        for (id in state.edges) { // WAS-EACH
+        for (var id in state.edges) { // WAS-EACH
           var edge = state.edges[id];
           // if ((branch.edges[edge.source.name]===undefined || branch.edges[edge.source.name][edge.target.name]===undefined) &&
           //     (branch.edges[edge.target.name]===undefined || branch.edges[edge.target.name][edge.source.name]===undefined)){
@@ -376,7 +376,7 @@
         }else{
           // called with (node1, node2, dur, to)
           var edges = that.getEdges(a,b)
-          for (i in edges) { // WAS-EACH
+          for (var i in edges) { // WAS-EACH
             that._tweenEdge(edges[i], c, d)
           }
         }
@@ -523,7 +523,7 @@
         var topleft = null
 
         // find the true x/y range of the nodes
-        for (id in state.nodes) { // WAS-EACH
+        for (var id in state.nodes) { // WAS-EACH
           var node = state.nodes[id];
           if (!bottomright){
             bottomright = new Point(node._p)
@@ -557,7 +557,7 @@
         var min = {node: null, point: null, distance: null};
         var t = that;
         
-        for (id in state.nodes) { // WAS-EACH
+        for (var id in state.nodes) { // WAS-EACH
           var node = state.nodes[id];
           var pt = node._p
           if (pt.x===null || pt.y===null) continue

@@ -20,7 +20,7 @@ while (<>) {
 	}
 	{
 		my ($obj, $key, $val, $ind) = ($1, $2, $3, $4);
-		"for ($key in $obj) \{ // WAS-EACH\n"
+		"for (var $key in $obj) \{ // WAS-EACH\n"
 			. "${ind}var $val = $obj\[$key\];\n"
 			. "$ind"
 	}ex;
