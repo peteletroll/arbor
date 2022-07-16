@@ -11,8 +11,8 @@
     var that = {
       init:function(){
         
-        dom.find('.ctrl > a').on('click', that.menuClick)
-        _dialog.find('li>a').on('click', that.exampleClick)
+        dom.on('click', '.ctrl > a', that.menuClick)
+        dom.on('click', '.dialog li>a', that.exampleClick)
         
         $.getJSON("library/toc.json", function(resp){
           _dialog.append($("<h1>Choose Your Own Adventure</h1>"))
