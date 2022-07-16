@@ -10,7 +10,7 @@
       var from = -1,
           to = -1,
           depth = 0;
-      $.each(s, function(i, c){
+      $.each(s.split(""), function(i, c){
         switch (c){
           case '{':
             if (depth==0 && from==-1) from = i
