@@ -302,9 +302,7 @@
           dom.find('p').css('opacity',0).show().fadeTo('slow',1)
         }
 
-        switch (_path){
-          case '':
-          case '/':
+        if (_path === '' || _path.match(/\/$/)){
           dom.find('p').text('a graph visualization library using web workers and jQuery')
           dom.find('> a').removeClass('active').attr('href','#')
 
@@ -313,10 +311,7 @@
             $(that).trigger({type:'mode', mode:'visible', dt:dt})
           })
           document.title = "arbor.js"
-          break
-          
-          case 'introduction':
-          case 'reference':
+	} else if (_path === 'introduction' || _path === 'reference'){
           $(that).trigger({type:'mode', mode:'hidden', dt:dt})
           dom.find('> p').text(_path)
           dom.find('> a').addClass('active').attr('href','#')
@@ -325,7 +320,6 @@
           $('#docs').find(">div").hide()
           $('#docs').find('#'+_path).show()
           document.title = "arbor.js » " + _path
-          break
         }
         
       }
