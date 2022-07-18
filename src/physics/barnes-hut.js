@@ -46,7 +46,7 @@
             }
             
           }else if ('origin' in node[p_quad]){
-            // slot conatins a branch node, keep iterating with the branch
+            // slot contains a branch node, keep iterating with the branch
             // as our new root
             node.mass += (p_mass)
             if (node.p) node.p = node.p.add(particle.p.multiply(p_mass))
@@ -163,10 +163,10 @@
           var branch = _branches[_branchCtr]
           branch.ne = branch.nw = branch.se = branch.sw = undefined
           branch.mass = 0
-          delete branch.p
+          branch.p = undefined
         }else{
           branch = {origin:null, size:null, 
-                    nw:undefined, ne:undefined, sw:undefined, se:undefined, mass:0}
+                    nw:undefined, ne:undefined, sw:undefined, se:undefined, mass:0, p:undefined}
           _branches[_branchCtr] = branch
         }
 
