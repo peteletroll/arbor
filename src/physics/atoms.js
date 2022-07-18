@@ -74,8 +74,7 @@ Queue.prototype = {
 Queue.prototype.__defineGetter__("length", function() { return this.q.length - this.p; });
 
 var Point = function(x, y){
-  if (y === undefined)
-    throw "polymorphic Point()";
+  // if (y === undefined) throw "polymorphic Point()";
   this.x = x;
   this.y = y;
 }
