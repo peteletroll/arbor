@@ -53,6 +53,26 @@ Spring.prototype.distanceToParticle = function(point)
   return Math.abs(ac.x * n.x + ac.y * n.y);
 };
 
+var Queue = function() {
+  this.p = 0;
+  this.q = new Array();
+}
+Queue.prototype = {
+  push: function() {
+    this.q.push.apply(this.q, arguments);
+    return this;
+  },
+  shift: function() {
+    if (this.p > 1024) {
+	    console.log("SPLICE");
+	    this.q.splice(0, 1024);
+	    this.p -= 1024;
+    }
+    return this.q[this.p++];
+  },
+};
+Queue.prototype.__defineGetter__("length", function() { return this.q.length - this.p; });
+
 var Point = function(x, y){
   if (y !== undefined) {
     this.x = x;

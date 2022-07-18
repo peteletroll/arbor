@@ -106,7 +106,7 @@
       applyForces:function(particle, repulsion){
         // find all particles/branch nodes this particle interacts with and apply
         // the specified repulsion to the particle
-        var queue = [_root]
+        var queue = new Queue().push(_root);
         while (queue.length){
           node = queue.shift()
           if (node===undefined) continue
@@ -127,10 +127,7 @@
             var size = Math.sqrt(node.size.x * node.size.y)
             if (size/dist > _theta){ // i.e., s/d > Θ
               // open the quad and recurse
-              queue.push(node.ne)
-              queue.push(node.nw)
-              queue.push(node.se)
-              queue.push(node.sw)
+              queue.push(node.ne, node.nw, node.se, node.sw)
             }else{
               // treat the quad as a single body
               var d = particle.p.subtract(node.p.divide(node.mass));
