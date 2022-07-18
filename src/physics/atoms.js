@@ -63,6 +63,11 @@ Queue.prototype = {
     return this;
   },
   shift: function() {
+    if (this.p > 1024) {
+	    console.log("SPLICE");
+	    this.q.splice(0, 1024);
+	    this.p -= 1024;
+    }
     return this.q[this.p++];
   },
 };

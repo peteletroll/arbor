@@ -127,10 +127,7 @@
             var size = Math.sqrt(node.size.x * node.size.y)
             if (size/dist > _theta){ // i.e., s/d > Θ
               // open the quad and recurse
-              queue.push(node.ne)
-              queue.push(node.nw)
-              queue.push(node.se)
-              queue.push(node.sw)
+              queue.push(node.ne, node.nw, node.se, node.sw)
             }else{
               // treat the quad as a single body
               var d = particle.p.subtract(node.p.divide(node.mass));
