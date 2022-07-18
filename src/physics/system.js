@@ -528,8 +528,8 @@
         for (var id in state.nodes) { // WAS-EACH
           var node = state.nodes[id];
           if (!bottomright){
-            bottomright = new Point(node._p)
-            topleft = new Point(node._p)
+            bottomright = node._p.clone();
+            topleft = node._p.clone();
             continue
           }
         

@@ -65,7 +65,7 @@
             //    as a single body in applyForces below
             if (branch_size.magnitude() == 0) return;
 
-            var branch_origin = new Point(node.origin)
+            var branch_origin = node.origin.clone();
             if (p_quad[0]=='s') branch_origin.y += branch_size.y
             if (p_quad[1]=='e') branch_origin.x += branch_size.x
 
