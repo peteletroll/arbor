@@ -82,13 +82,9 @@ Queue.prototype = {
 };
 
 var Point = function(x, y){
-  if (y !== undefined) {
-    this.x = x;
-    this.y = y;
-  } else {
-    this.x = x.x;
-    this.y = x.y;
-  }
+  // if (y === undefined) throw "polymorphic Point()";
+  this.x = x;
+  this.y = y;
 }
 
 Point.random = function(radius){
@@ -97,6 +93,9 @@ Point.random = function(radius){
 }
 
 Point.prototype = {
+  clone:function(){
+    return new Point(this.x, this.y);
+  },
   exploded:function(){
     return ( isNaN(this.x) || isNaN(this.y) )
   },

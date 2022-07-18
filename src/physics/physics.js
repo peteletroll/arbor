@@ -226,8 +226,8 @@
       applyBarnesHutRepulsion:function(){
         if (!_bounds.topleft || !_bounds.bottomright) return
         if (Object.keys(active.particles).length < 2) return
-        var bottomright = new Point(_bounds.bottomright)
-        var topleft = new Point(_bounds.topleft)
+        var bottomright = _bounds.bottomright.clone();
+        var topleft = _bounds.topleft.clone();
 
         // build a barnes-hut tree...
         bhTree.init(topleft, bottomright, that.theta)        
