@@ -107,7 +107,7 @@
         // find all particles/branch nodes this particle interacts with and apply
         // the specified repulsion to the particle
         var queue = new Queue().push(_root);
-        while (queue.length){
+        while (queue.length > 0){
           node = queue.shift()
           if (node===undefined) continue
           if (particle===node) continue
