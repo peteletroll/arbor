@@ -14,7 +14,7 @@
   var HalfViz = function(elt){
     var dom = $(elt)
 
-    sys = arbor.ParticleSystem(2600, 512, 0.5)
+    sys = arbor.ParticleSystem({repulsion:2600, stiffness:512, friction:0.5, worker:false})
     sys.renderer = Renderer("#viewport") // our newly created renderer will have its .init() method called shortly by sys...
     sys.screenPadding(20)
     

@@ -8,7 +8,7 @@
     // in chrome, web workers aren't available to pages with file:// urls
     var chrome_local_file = window.location.protocol == "file:" &&
                             navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-    var USE_WORKER = (window.Worker !== undefined && !chrome_local_file)    
+    var USE_WORKER = (window.Worker !== undefined && !chrome_local_file && pSystem.parameters().worker)
     
     var _physics = null
     var _tween = null
