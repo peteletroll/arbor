@@ -70,6 +70,12 @@ Queue.prototype = {
     }
     return this.q[this.p++];
   },
+  unshift: function(e) {
+    if (--this.p < 0)
+      throw "can't unshift";
+    this.q[this.p] = e;
+    return this;
+  }
 };
 Queue.prototype.__defineGetter__("length", function() { return this.q.length - this.p; });
 

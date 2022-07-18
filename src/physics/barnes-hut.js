@@ -28,7 +28,7 @@
       insert:function(newParticle){
         // add a particle to the tree, starting at the current _root and working down
         var node = _root
-        var queue = [newParticle]
+        var queue = new Queue().push(newParticle);
 
         while (queue.length){
           var particle = queue.shift()
