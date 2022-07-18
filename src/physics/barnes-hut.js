@@ -106,7 +106,7 @@
       applyForces:function(particle, repulsion){
         // find all particles/branch nodes this particle interacts with and apply
         // the specified repulsion to the particle
-        var queue = [_root]
+        var queue = new Queue().push(_root);
         while (queue.length){
           node = queue.shift()
           if (node===undefined) continue

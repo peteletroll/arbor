@@ -53,6 +53,23 @@ Spring.prototype.distanceToParticle = function(point)
   return Math.abs(ac.x * n.x + ac.y * n.y);
 };
 
+var Queue = function() {
+  this.p = 0;
+  this.q = new Array();
+  this.length = 0;
+}
+Queue.prototype = {
+  push: function() {
+    this.q.push.apply(this.q, arguments);
+    this.length += arguments.length;
+    return this;
+  },
+  shift: function() {
+    this.length--;
+    return this.q[this.p++];
+  },
+};
+
 var Point = function(x, y){
   if (y !== undefined) {
     this.x = x;
