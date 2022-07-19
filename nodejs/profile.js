@@ -28,9 +28,17 @@ load("../src/physics/system.js");
 load("../src/dev.js");
 
 var system = new ParticleSystem({ fps: 10000 });
+
+var steps = 10000;
+
 system.renderer = {
 	init: function(e) { console.log("INIT", e) },
-	redraw: function(e) { console.log("REDRAW", e, system.fps()) },
+	redraw: function(e) {
+		if (steps % 1000 == 0)
+			console.log("LEFT", steps, "FPS", system.fps(), "ENERGY", system.energy());
+		if (--steps < 0)
+			system.stop();
+	},
 };
 
 system.graft({
@@ -46,6 +54,4 @@ system.graft({
 		}
 	}
 });
-
-// process.exit(0);
 
