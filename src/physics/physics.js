@@ -160,7 +160,7 @@
       },
 
       tendParticles:function(){
-        for (id in active.particles) {
+        for (var id in active.particles) {
           var pt = active.particles[id];
           // decay down any of the temporary mass increases that were passed along
           // by using an {_m:} instead of an {m:} (which is to say via a Node having
@@ -168,7 +168,8 @@
           if (pt._m!==undefined){
             if (Math.abs(pt.m-pt._m)<1){
               pt.m = pt._m
-              delete pt._m
+              // delete pt._m
+              pt._m = undefined
             }else{
               pt.m *= .98
             }
