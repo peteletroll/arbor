@@ -34,7 +34,6 @@ var Particle = function(position, mass){
   this.v = new Point(0, 0); // velocity
   this.f = new Point(0, 0); // force
   this.fixed = false;
-  this.connections = 0;
   this._F = new Point(0, 0);
   this._m = undefined;
 };

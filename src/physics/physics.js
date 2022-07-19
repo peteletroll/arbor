@@ -59,7 +59,6 @@
 
         
         active.particles[id] = new Particle(randomish_pt, mass);
-        active.particles[id].connections = 0
         active.particles[id].fixed = (c.f===1)
         free.particles[id] = active.particles[id]
         particles.push(active.particles[id])        
@@ -98,9 +97,6 @@
           active.springs[id] = new Spring(from, to, length, that.stiffness)
           springs.push(active.springs[id])
           
-          from.connections++
-          to.connections++
-          
           delete free.particles[c.fm]
           delete free.particles[c.to]
         }
@@ -109,9 +105,6 @@
       dropSpring:function(c){
         var id = c.id
         var dropping = active.springs[id]
-        
-        dropping.point1.connections--
-        dropping.point2.connections--
         
         var idx = springs.findIndex(function(e) { return e === dropping });
         if (idx>-1){
