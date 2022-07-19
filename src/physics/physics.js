@@ -168,7 +168,6 @@
           if (pt._m!==undefined){
             if (Math.abs(pt.m-pt._m)<1){
               pt.m = pt._m
-              // delete pt._m
               pt._m = undefined
             }else{
               pt.m *= .98

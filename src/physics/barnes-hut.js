@@ -34,7 +34,6 @@
           var particle = queue.shift()
           var p_mass = particle._m || particle.m
           var p_quad = that._whichQuad(particle, node)
-          // console.log("PARTICLE", particle, "P_QUAD", p_quad);
 
           if (node[p_quad]===undefined){
             // slot is empty, just drop this node in and update the mass/c.o.m.

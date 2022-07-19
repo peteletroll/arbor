@@ -39,15 +39,6 @@ var Particle = function(position, mass){
   this._m = undefined;
 };
 
-var _psig_ = { };
-Particle.prototype._applyForce = function(force){
-	var sig = Object.keys(this).map(k => k + ":" + typeof this[k]).join(",");
-	if (!_psig_[sig]) {
-		console.log("P", sig);
-		_psig_[sig] = true;
-	}
-	this._applyForce(force);
-};
 Particle.prototype.applyForce = function(force){
 	this.f = this.f.add(force.divide(this.m));
 };
