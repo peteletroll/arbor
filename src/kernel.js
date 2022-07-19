@@ -13,7 +13,7 @@
     var _physics = null
     var _tween = null
     var _fpsWindow = [] // for keeping track of the actual frame rate
-    _fpsWindow.last = new Date()
+    _fpsWindow.last = Date.now()
     var _screenInterval = null
     var _attached = null
 
@@ -114,11 +114,11 @@
 
       // 
       // the main render loop when running in web worker mode
-      _lastFrametime:new Date().valueOf(),
+      _lastFrametime:Date.now(),
       _lastBounds:null,
       _currentRenderer:null,
       screenUpdate:function(){        
-        var now = new Date().valueOf()
+        var now = Date.now()
         
         var shouldRedraw = false
         if (that._lastPositions!==null){
@@ -144,7 +144,7 @@
             render.redraw()
 
             var prevFrame = _fpsWindow.last
-            _fpsWindow.last = new Date()
+            _fpsWindow.last = Date.now()
             _fpsWindow.push(_fpsWindow.last-prevFrame)
             if (_fpsWindow.length>50) _fpsWindow.shift()
           }
@@ -161,7 +161,7 @@
         if (_tween && _tween.busy()) stillActive = true
 
         var render = that.system.renderer
-        var now = new Date()        
+        var now = Date.now()
         var render = that.system.renderer
         if (render!==undefined){
           if (render !== _attached){
@@ -179,8 +179,8 @@
         // but stop the simulation when energy of the system goes below a threshold
         var sysEnergy = _physics.systemEnergy()
         if ((sysEnergy.mean + sysEnergy.max)/2 < 0.05){
-          if (_lastTick===null) _lastTick=new Date().valueOf()
-          if (new Date().valueOf()-_lastTick>1000){
+          if (_lastTick===null) _lastTick=Date.now()
+          if (Date.now()-_lastTick>1000){
             // trace('stopping')
             clearInterval(_tickInterval)
             _tickInterval = null
@@ -203,8 +203,8 @@
         
         var totInterv = 0
         for (var i=0, j=_fpsWindow.length; i<j; i++) totInterv+=_fpsWindow[i]
-        var meanIntev = totInterv/Math.max(1,_fpsWindow.length)
-        if (!isNaN(meanIntev)) return Math.round(1000/meanIntev)
+        var meanInterv = totInterv/Math.max(1,_fpsWindow.length)
+        if (!isNaN(meanInterv)) return 1000/meanInterv
         else return 0
       },
 
