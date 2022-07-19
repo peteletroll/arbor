@@ -59,14 +59,15 @@ var graph = Parseur().parse(json.src);
 
 var system = new ParticleSystem({ fps: 10000 });
 
-var steps = 10000;
+var start = Date.now();
+var steps = 0;
 
 system.renderer = {
 	init: function(e) { console.log("INIT", e) },
 	redraw: function(e) {
-		if (steps % 10 == 0)
-			console.log("LEFT", steps, "FPS", system.fps(), "ENERGY", system.energy());
-		if (--steps < 0)
+		if (++steps % 10 == 0)
+			console.log("LEFT", steps, "FPS", system.fps().toFixed(2), "ENERGY", system.energy());
+		if (Date.now() - start > 20e3)
 			system.stop();
 	},
 };
