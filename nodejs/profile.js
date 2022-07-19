@@ -4,12 +4,37 @@ var vm = require("vm");
 global.window = { location: { protocol: "" } };
 
 global.$ = {
-	extend: Object.assign
+	extend: Object.assign,
+	each: function(obj, callback){
+		if (Array.isArray(obj)) {
+			for (var i = 0, j = obj.length; i < j; i++)
+				callback(i, obj[i]);
+		} else {
+			for (var k in obj)
+				callback(k, obj[k]);
+		}
+	},
+	isEmptyObject: function(obj) {
+		return Object.keys(obj).length <= 0
+	},
+	map: function(arr, fn) {
+		var out = [];
+		$.each(arr, function(i, elt) {
+			var result = fn(elt);
+			if (result !== undefined)
+				out.push(result)
+		});
+		return out;
+	}
 };
 
-function load(file) {
+function gulp(file) {
 	console.log("LOADING", file);
-	var content = fs.readFileSync(file, "utf8");
+	return fs.readFileSync(file, "utf8");
+}
+
+function load(file) {
+	var content = gulp(file, "utf8");
 	var script = new vm.Script("\"no strict\";" + content, file);
 	script.runInNewContext(global);
 }
@@ -27,6 +52,11 @@ load("../src/physics/physics.js");
 load("../src/physics/system.js");
 load("../src/dev.js");
 
+load("../demos/halfviz/src/parseur.js");
+var json = JSON.parse(gulp("../demos/halfviz/library/the-mystery-of-chimney-rock.json"));
+var graph = Parseur().parse(json.src);
+// console.log(JSON.stringify(graph, null, "  "));
+
 var system = new ParticleSystem({ fps: 10000 });
 
 var steps = 10000;
@@ -34,24 +64,12 @@ var steps = 10000;
 system.renderer = {
 	init: function(e) { console.log("INIT", e) },
 	redraw: function(e) {
-		if (steps % 1000 == 0)
+		if (steps % 10 == 0)
 			console.log("LEFT", steps, "FPS", system.fps(), "ENERGY", system.energy());
 		if (--steps < 0)
 			system.stop();
 	},
 };
 
-system.graft({
-	nodes:{
-		f: { alone: true, mass:.25 }
-	}, 
-	edges:{
-		a:{
-			b:{},
-			c:{},
-			d:{},
-			e:{}
-		}
-	}
-});
+system.graft(graph);
 
