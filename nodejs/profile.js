@@ -3,7 +3,10 @@
 var fs = require("fs");
 var vm = require("vm");
 
-global.window = { location: { protocol: "" } };
+global.window = {
+	location: { protocol: "" },
+	console: true
+};
 
 global.$ = {
 	extend: Object.assign,
