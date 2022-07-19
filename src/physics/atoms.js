@@ -30,18 +30,17 @@ var _nextEdgeId = -1
 
 var Particle = function(position, mass){
   this.p = position;
-  this.m = 1 * mass;
-	this.v = new Point(0, 0); // velocity
-	this.f = new Point(0, 0); // force
-  this.fixed = undefined;
+  this.m = mass;
+  this.v = new Point(0, 0); // velocity
+  this.f = new Point(0, 0); // force
+  this.fixed = false;
   this.connections = 0;
-  // this._F = new Point(0, 0);
-  // this._F = undefined;
+  this._F = new Point(0, 0);
   this._m = undefined;
 };
 
 var _psig_ = { };
-Particle.prototype.applyForce = function(force){
+Particle.prototype._applyForce = function(force){
 	var sig = Object.keys(this).map(k => k + ":" + typeof this[k]).join(",");
 	if (!_psig_[sig]) {
 		console.log("P", sig);
@@ -49,7 +48,7 @@ Particle.prototype.applyForce = function(force){
 	}
 	this._applyForce(force);
 };
-Particle.prototype._applyForce = function(force){
+Particle.prototype.applyForce = function(force){
 	this.f = this.f.add(force.divide(this.m));
 };
 
