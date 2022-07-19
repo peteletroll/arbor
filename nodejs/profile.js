@@ -1,3 +1,5 @@
+#!/usr/bin/nodejs
+
 var fs = require("fs");
 var vm = require("vm");
 
@@ -29,7 +31,7 @@ global.$ = {
 };
 
 function gulp(file) {
-	console.log("LOADING", file);
+	// console.log("LOADING", file);
 	return fs.readFileSync(file, "utf8");
 }
 
@@ -55,21 +57,27 @@ load("../src/dev.js");
 load("../demos/halfviz/src/parseur.js");
 var json = JSON.parse(gulp("../demos/halfviz/library/the-mystery-of-chimney-rock.json"));
 var graph = Parseur().parse(json.src);
-// console.log(JSON.stringify(graph, null, "  "));
 
 var system = new ParticleSystem({ fps: 10000 });
 
 var start = Date.now();
-var steps = 0;
+var last = start;
+var step = 0;
 
 system.renderer = {
-	init: function(e) { console.log("INIT", e) },
+	init: function(e) { },
 	redraw: function(e) {
-		if (++steps % 10 == 0)
-			console.log("LEFT", steps, "FPS", system.fps().toFixed(2), "ENERGY", system.energy());
-		if (Date.now() - start > 20e3)
+		step++;
+		var now = Date.now();
+		if (now - last > 1e3) {
+			last = now;
+			console.log("STEP", step,
+				"FPS", system.fps().toFixed(2),
+				"ENERGY", system.energy().sum.toPrecision(3));
+		}
+		if (now - start > 20e3)
 			system.stop();
-	},
+	}
 };
 
 system.graft(graph);
