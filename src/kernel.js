@@ -93,6 +93,10 @@
         that.start() // <- is this just to kick things off in the non-worker mode? (yes)
       },
       
+      useWorker:function(){
+        return USE_WORKER;
+      },
+
       workerMsg:function(e){
         switch (e.data.type) {
           case 'geometry':
