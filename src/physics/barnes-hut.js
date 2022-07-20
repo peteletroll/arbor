@@ -13,6 +13,7 @@
     var _branchCtr = 0
     var _root = null
     var _theta = .5
+    var queue = new Queue();
     
     var that = {
       init:function(topleft, bottomright, theta){
@@ -28,7 +29,7 @@
       insert:function(newParticle){
         // add a particle to the tree, starting at the current _root and working down
         var node = _root
-        var queue = new Queue().push(newParticle);
+        queue.empty().push(newParticle);
 
         while (queue.length){
           var particle = queue.shift()
@@ -106,8 +107,8 @@
       applyForces:function(particle, repulsion){
         // find all particles/branch nodes this particle interacts with and apply
         // the specified repulsion to the particle
-        var queue = new Queue().push(_root);
-        while (queue.length){
+        queue.empty().push(_root);
+        while (queue.length > 0){
           node = queue.shift()
           if (node===undefined) continue
           if (particle===node) continue
