@@ -259,7 +259,7 @@
         var numParticles = 0
         var centroid = new Point(0,0)
         for (var id in active.particles) {
-          centroid.add(active.particles[id].p)
+          centroid = centroid.add(active.particles[id].p)
           numParticles++
         }
 
