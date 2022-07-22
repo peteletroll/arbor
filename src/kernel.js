@@ -48,7 +48,7 @@
                                                 {timeout:Math.ceil(params.timeout)}) })
         }else{
           trace('arbor.js/single-threaded',params)
-          _physics = Physics(params.dt, params.stiffness, params.repulsion, params.friction, that.system._updateGeometry, params.integrator)
+          _physics = Physics(params.dt, params.stiffness, params.repulsion, params.friction, that.system._updateGeometry, params.integrator, params.precision)
           that.start()
         }
 

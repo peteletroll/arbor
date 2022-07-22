@@ -4,7 +4,7 @@
 // the particle system itself. either run inline or in a worker (see worker.js)
 //
 
-  var Physics = function(dt, stiffness, repulsion, friction, updateFn, integrator){
+  var Physics = function(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
     var bhTree = BarnesHutTree() // for computing particle repulsion
     var active = {particles:{}, springs:{}}
     var free = {particles:{}}
@@ -23,7 +23,7 @@
       friction:(friction!==undefined)? friction : .3,
       gravity:false,
       dt:(dt!==undefined)? dt : 0.02,
-      theta:.4, // the criterion value for the barnes-hut s/d calculation
+      theta:(precision!==undefined) ? 1-precision : .4, // the criterion value for the barnes-hut s/d calculation
       
       init:function(){
         return that
