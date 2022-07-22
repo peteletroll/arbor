@@ -125,7 +125,9 @@
             // it's a branch node so decide if it's cluster-y and distant enough
             // to summarize as a single point. if it's too complex, open it and deal
             // with its quadrants in turn
-            var dist = particle.p.subtract(node.p.divide(node.mass)).magnitude()
+            // remember that node.p = Σ pᵢmᵢ, actual position is node.p / node.mass
+            var node_p = node.p.divide(node.mass);
+            var dist = particle.p.subtract(node_p).magnitude()
             var size = Math.sqrt(node.size.x * node.size.y)
             if (size/dist > _theta){ // i.e., s/d > Θ
               // open the quad and recurse
@@ -135,11 +137,11 @@
               queue.push(node.sw)
             }else{
               // treat the quad as a single body
-              var d = particle.p.subtract(node.p.divide(node.mass));
+              var d = particle.p.subtract(node_p);
               var distance = Math.max(1.0, d.magnitude());
               var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
-              particle.applyForce(direction.multiply(repulsion*(node.mass))
-                                           .divide(distance * distance) );
+              var force = repulsion * pmass * node.mass / (distance * distance);
+              particle.applyForce(direction.multiply(force));
             }
           }
         }
