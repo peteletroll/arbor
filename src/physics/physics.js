@@ -197,8 +197,8 @@
         for (var id1 in active.particles) {
           var point1 = active.particles[id1];
           for (var id2 in active.particles) {
-            var point2 = active.particles[id2];
-            if (point1 !== point2){
+            if (id1 < id2) { // don't compute the same force twice
+              var point2 = active.particles[id2];
               var d = point1.p.subtract(point2.p);
               var distance = Math.max(1.0, d.magnitude());
               var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
@@ -207,10 +207,10 @@
               // (consult the cached `real' mass value if the mass is being poked to allow
               // for repositioning. the poked mass will still be used in .applyforce() so
               // all should be well)
-              point1.applyForce(direction.multiply(that.repulsion*(point2._m||point2.m)*.5)
-                                         .divide(distance * distance * 0.5) );
-              point2.applyForce(direction.multiply(that.repulsion*(point1._m||point1.m)*.5)
-                                         .divide(distance * distance * -0.5) );
+              var force = that.repulsion * (point1._m||point1.m) * (point2._m||point2.m)
+                / (distance * distance);
+              point1.applyForce(direction.multiply(force));
+              point2.applyForce(direction.multiply(-force));
             }
           }
         }
