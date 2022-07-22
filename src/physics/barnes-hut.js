@@ -107,6 +107,7 @@
       applyForces:function(particle, repulsion){
         // find all particles/branch nodes this particle interacts with and apply
         // the specified repulsion to the particle
+        var pmass = particle._m || particle.m;
         queue.empty().push(_root);
         while (queue.length > 0){
           node = queue.shift()
@@ -118,8 +119,8 @@
             var d = particle.p.subtract(node.p);
             var distance = Math.max(1.0, d.magnitude());
             var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
-            particle.applyForce(direction.multiply(repulsion*(node._m||node.m))
-                                      .divide(distance * distance) );
+            var force = repulsion * pmass * (node._m||node.m) / (distance * distance);
+            particle.applyForce(direction.multiply(force));
           }else{
             // it's a branch node so decide if it's cluster-y and distant enough
             // to summarize as a single point. if it's too complex, open it and deal
