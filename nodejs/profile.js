@@ -58,10 +58,11 @@ load("../src/physics/system.js");
 load("../src/dev.js");
 
 load("../demos/halfviz/src/parseur.js");
-var json = JSON.parse(gulp("../demos/halfviz/library/the-mystery-of-chimney-rock.json"));
+var file = process.argv.length > 2 ? process.argv[2] : "../demos/halfviz/library/the-mystery-of-chimney-rock.json";
+var json = JSON.parse(gulp(file));
 var graph = Parseur().parse(json.src);
 
-var system = new ParticleSystem({ fps: 10000 });
+var system = new ParticleSystem({ fps: 10000, precision: .6 });
 
 var start = Date.now();
 var last = start;
@@ -83,5 +84,8 @@ system.renderer = {
 	}
 };
 
+var keys = Object.keys;
+console.log("NODES:", keys(graph.nodes).length,
+	"EDGES:", keys(graph.edges).flatMap(n => keys(graph.edges[n])).length);
 system.graft(graph);
 
