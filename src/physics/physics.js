@@ -247,8 +247,10 @@
           // doesn't work very well though. what's the `right' way to do it?
 
           // apply force to each end point
-          spring.point1.applyForce(direction.multiply(spring.k * -displacement))
-          spring.point2.applyForce(direction.multiply(spring.k * displacement))
+          // the 0.5 factor is physically wrong, but it's too old a bug to fix
+          var force = spring.k * displacement * 0.5;
+          spring.point1.applyForce(direction.multiply(-force))
+          spring.point2.applyForce(direction.multiply(force))
         }
       },
 
