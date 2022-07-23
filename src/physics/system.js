@@ -602,43 +602,45 @@
     // some magic attrs to make the Node objects phone-home their physics-relevant changes
     var def = Object.defineProperty;
 
-    Node.prototype.__defineGetter__("p", function() { 
-      trace("GETTER p");
-      var self = this
-      var roboPoint = {}
-      roboPoint.__defineGetter__('x', function(){ trace("GETTER p.x"); return self._p.x; })
-      roboPoint.__defineSetter__('x', function(newX){ trace("SETTER p.x"); state.kernel.particleModified(self._id, {x:newX}) })
-      roboPoint.__defineGetter__('y', function(){ trace("GETTER p.y"); return self._p.y; })
-      roboPoint.__defineSetter__('y', function(newY){ trace("SETTER p.y"); state.kernel.particleModified(self._id, {y:newY}) })
-      roboPoint.__proto__ = Point.prototype
-      return roboPoint
-    })
-    Node.prototype.__defineSetter__("p", function(newP) { 
-      trace("SETTER p");
-      this._p.x = newP.x
-      this._p.y = newP.y
-      state.kernel.particleModified(this._id, {x:newP.x, y:newP.y})
-    })
+    def(Node.prototype, "p", {
+      get: function() {
+        trace("GETTER p");
+        var self = this;
+        var roboPoint = {};
+        roboPoint.__defineGetter__('x', function(){ trace("GETTER p.x"); return self._p.x; });
+        roboPoint.__defineSetter__('x', function(newX){ trace("SETTER p.x"); state.kernel.particleModified(self._id, {x:newX}) });
+        roboPoint.__defineGetter__('y', function(){ trace("GETTER p.y"); return self._p.y; });
+        roboPoint.__defineSetter__('y', function(newY){ trace("SETTER p.y"); state.kernel.particleModified(self._id, {y:newY}) });
+        roboPoint.__proto__ = Point.prototype;
+        return roboPoint;
+      },
+      set: function(newP) {
+        trace("SETTER p", newP);
+        this._p.x = newP.x;
+        this._p.y = newP.y;
+        state.kernel.particleModified(this._id, {x:newP.x, y:newP.y});
+      }
+    });
 
     def(Node.prototype, "mass", {
       get: function() {
         trace("GETTER mass");
         return this._mass;
       },
-      set: function(newM) { 
+      set: function(newM) {
         trace("SETTER mass", newM);
         this._mass = newM;
-        state.kernel.particleModified(this._id, {m:newM});
+        state.kernel.particleModified(this._id, { m: newM });
       }
     });
 
     def(Node.prototype, "tempMass", {
-      set: function(newM) { 
+      set: function(newM) {
         trace("SETTER tempMass", newM);
-        state.kernel.particleModified(this._id, {_m:newM})
+        state.kernel.particleModified(this._id, { _m: newM });
       }
     });
-      
+
     def(Node.prototype, "fixed", {
       get: function() {
         trace("GETTER fixed");
@@ -650,7 +652,7 @@
         state.kernel.particleModified(this._id, { f: isFixed ? 1 : 0 })
       }
     });
-    
+
     return that
   }
-  
+
