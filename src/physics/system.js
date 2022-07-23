@@ -620,12 +620,17 @@
       state.kernel.particleModified(this._id, {x:newP.x, y:newP.y})
     })
 
-    Node.prototype.__defineGetter__("mass", function() { trace("GETTER mass"); return this._mass; });
-    Node.prototype.__defineSetter__("mass", function(newM) { 
-      trace("SETTER mass");
-      this._mass = newM
-      state.kernel.particleModified(this._id, {m:newM})
-    })
+    def(Node.prototype, "mass", {
+      get: function() {
+        trace("GETTER mass");
+        return this._mass;
+      },
+      set: function(newM) { 
+        trace("SETTER mass", newM);
+        this._mass = newM;
+        state.kernel.particleModified(this._id, {m:newM});
+      }
+    });
 
     def(Node.prototype, "tempMass", {
       set: function(newM) { 
