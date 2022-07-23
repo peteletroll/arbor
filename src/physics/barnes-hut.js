@@ -110,7 +110,7 @@
         var pmass = particle._m || particle.m;
         queue.empty().push(_root);
         while (queue.length > 0){
-          node = queue.shift()
+          var node = queue.shift()
           if (node===undefined) continue
           if (particle===node) continue
           
