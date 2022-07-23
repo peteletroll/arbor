@@ -22,7 +22,7 @@ import shutil
 
 # your system configuration may vary...
 YUI_PATH = "uglifyjs"
-YUI_OPTIONS = ""
+YUI_OPTIONS = "--compress --mangle"
 
 
 
