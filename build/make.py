@@ -21,15 +21,9 @@ from datetime import datetime
 import shutil
 
 
-# apparently there is no stable download link for <most-recent-version> of 
-# yui, so this could url well be stale. if so you can try looking for a 
-# new link at: http://yuilibrary.com/downloads/#yuicompressor
-YUI_LIB_URL = "http://yui.zenfs.com/releases/yuicompressor/yuicompressor-2.4.6.zip"
-
 # your system configuration may vary...
-YUI_PATH = "/usr/local/bin/yui"
-YUI_OPTIONS = "--type=js"
-# YUI_OPTIONS = "--nomunge --disable-optimizations --type=js"
+YUI_PATH = "uglifyjs"
+YUI_OPTIONS = ""
 
 
 
@@ -171,42 +165,7 @@ def compile(js, title=None, padding=10):
     return yui_output
   
 
-def get_yui():
-  from zipfile import ZipFile
-  from cStringIO import StringIO
-
-  print "fetching yui compressor"
-  data = urlopen(YUI_LIB_URL)
-  yuizip = ZipFile(StringIO(data.read()))
-  jarpath = [f for f in yuizip.namelist() if 'build/yuicompressor' in f][0]
-  
-  if not os.path.exists('.yui'): os.mkdir('.yui')
-  jardata = yuizip.open(jarpath).read()
-  with file('.yui/%s'%os.path.basename(jarpath),'w') as f:
-    f.write(jardata)
-  print "placed jar at",'.yui/%s'%os.path.basename(jarpath)
-  
-  binfile = "#!/bin/sh\n\njava -jar %s $@\n" % os.path.abspath('.yui/'+os.path.basename(jarpath))
-  with file('yui','wb') as f:
-    f.write(binfile)
-  os.chmod('yui',0755)
-  print "created yui script in current dir\n"
-  
-  
 def main():
-  global YUI_PATH
-  YUI_PATH = os.path.abspath(YUI_PATH)
-  if not os.path.exists(YUI_PATH):
-    if not os.path.exists('./yui'):
-      
-      should_get = raw_input('Can\'t find the YUI compresser.\nTry fetching a copy? (y/n) ')
-      if should_get.lower().startswith('y'):
-        get_yui()
-      else:
-        print "Please adjust the YUI_PATH variable in the script to point to the proper command"
-        sys.exit(1)
-    YUI_PATH = os.path.abspath('./yui')
-
   os.chdir("%s/.."%os.path.dirname(os.path.abspath(__file__)))
   make_lib()
 
