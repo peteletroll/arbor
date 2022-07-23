@@ -607,8 +607,16 @@
         trace("GETTER p");
         var self = this;
         var roboPoint = {};
-        roboPoint.__defineGetter__('x', function(){ trace("GETTER p.x"); return self._p.x; });
-        roboPoint.__defineSetter__('x', function(newX){ trace("SETTER p.x"); state.kernel.particleModified(self._id, {x:newX}) });
+        def(roboPoint, "x", {
+          get: function() {
+            trace("GETTER p.x");
+            return self._p.x;
+          },
+          set: function(newX) {
+            trace("SETTER p.x");
+            state.kernel.particleModified(self._id, { x: newX });
+          }
+        });
         roboPoint.__defineGetter__('y', function(){ trace("GETTER p.y"); return self._p.y; });
         roboPoint.__defineSetter__('y', function(newY){ trace("SETTER p.y"); state.kernel.particleModified(self._id, {y:newY}) });
         roboPoint.__proto__ = Point.prototype;
