@@ -606,7 +606,7 @@
       get: function() {
         trace("GETTER p");
         var self = this;
-        var roboPoint = {};
+        var roboPoint = Object.create(Point.prototype);
         def(roboPoint, "x", {
           get: function() {
             trace("GETTER p.x");
@@ -627,7 +627,6 @@
             state.kernel.particleModified(self._id, { y: newY });
           }
         });
-        roboPoint.__proto__ = Point.prototype;
         return roboPoint;
       },
       set: function(newP) {
