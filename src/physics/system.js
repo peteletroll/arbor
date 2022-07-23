@@ -627,10 +627,12 @@
       state.kernel.particleModified(this._id, {m:newM})
     })
 
-    Node.prototype.__defineSetter__("tempMass", function(newM) { 
-      trace("SETTER tempMass");
-      state.kernel.particleModified(this._id, {_m:newM})
-    })
+    def(Node.prototype, "tempMass", {
+      set: function(newM) { 
+        trace("SETTER tempMass", newM);
+        state.kernel.particleModified(this._id, {_m:newM})
+      }
+    });
       
     def(Node.prototype, "fixed", {
       get: function() {
@@ -638,7 +640,7 @@
         return this._fixed;
       },
       set: function(isFixed) {
-        trace("SETTER fixed");
+        trace("SETTER fixed", isFixed);
         this._fixed = isFixed;
         state.kernel.particleModified(this._id, { f: isFixed ? 1 : 0 })
       }
