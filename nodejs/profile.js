@@ -59,7 +59,7 @@ load("../src/dev.js");
 
 load("../demos/halfviz/src/parseur.js");
 
-var opts = { fps: 10000, precision: 0.6, seconds: 20e3 };
+var opts = { fps: 10000, precision: 0.6, seconds: 20 };
 
 var argv = process.argv;
 var argp = 2;
