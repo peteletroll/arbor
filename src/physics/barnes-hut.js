@@ -8,33 +8,35 @@
 //  Copyright (c) 2011 Samizdat Drafting Co. All rights reserved.
 //
 
-  var BarnesHutTree = function(){
-    var _branches = []
-    var _branchCtr = 0
-    var _root = null
-    var _theta = .5
-    var queue = new Queue();
+  function BarnesHutTree(){
+    this.branches = []
+    this.branchCtr = 0
+    this.root = null
+    this.theta = .5
+    this.queue = new Queue();
+  }
     
-    var that = {
+    BarnesHutTree.prototype = {
       init:function(topleft, bottomright, theta){
-        _theta = theta
+        this.theta = theta
 
         // create a fresh root node for these spatial bounds
-        _branchCtr = 0
-        _root = that._newBranch()
-        _root.origin = topleft
-        _root.size = bottomright.subtract(topleft)
+        this.branchCtr = 0
+        this.root = this.newBranch()
+        this.root.origin = topleft
+        this.root.size = bottomright.subtract(topleft)
       },
       
       insert:function(newParticle){
-        // add a particle to the tree, starting at the current _root and working down
-        var node = _root
+        // add a particle to the tree, starting at the current root and working down
+        var node = this.root
+        var queue = this.queue;
         queue.empty().push(newParticle);
 
         while (queue.length){
           var particle = queue.shift()
           var p_mass = particle._m || particle.m
-          var p_quad = that._whichQuad(particle, node)
+          var p_quad = this.whichQuad(particle, node)
 
           if (node[p_quad]===undefined){
             // slot is empty, just drop this node in and update the mass/c.o.m.
@@ -72,7 +74,7 @@
 
             // replace the previously particle-occupied quad with a new internal branch node
             var oldParticle = node[p_quad]
-            node[p_quad] = that._newBranch()
+            node[p_quad] = this.newBranch()
             node[p_quad].origin = branch_origin
             node[p_quad].size = branch_size
             node.mass = p_mass
@@ -108,7 +110,8 @@
         // find all particles/branch nodes this particle interacts with and apply
         // the specified repulsion to the particle
         var pmass = particle._m || particle.m;
-        queue.empty().push(_root);
+        var queue = this.queue;
+        queue.empty().push(this.root);
         while (queue.length > 0){
           var node = queue.shift()
           if (node===undefined) continue
@@ -129,7 +132,7 @@
             var node_p = node.p.divide(node.mass);
             var dist = particle.p.subtract(node_p).magnitude()
             var size = Math.sqrt(node.size.x * node.size.y)
-            if (size/dist > _theta){ // i.e., s/d > Θ
+            if (size/dist > this.theta){ // i.e., s/d > Θ
               // open the quad and recurse
               queue.push(node.ne)
               queue.push(node.nw)
@@ -147,7 +150,7 @@
         }
       },
       
-      _whichQuad:function(particle, node){
+      whichQuad:function(particle, node){
         // sort the particle into one of the quadrants of this node
         if (particle.p.exploded()) return null
         var particle_p = particle.p.subtract(node.origin)
@@ -161,24 +164,21 @@
         }
       },
       
-      _newBranch:function(){
+      newBranch:function(){
         // to prevent a gc horrorshow, recycle the tree nodes between iterations
-        if (_branches[_branchCtr]){
-          var branch = _branches[_branchCtr]
+        if (this.branches[this.branchCtr]){
+          var branch = this.branches[this.branchCtr]
           branch.ne = branch.nw = branch.se = branch.sw = undefined
           branch.mass = 0
           branch.p = undefined
         }else{
           branch = {origin:null, size:null, 
                     nw:undefined, ne:undefined, sw:undefined, se:undefined, mass:0, p:undefined}
-          _branches[_branchCtr] = branch
+          this.branches[this.branchCtr] = branch
         }
 
-        _branchCtr++
+        this.branchCtr++
         return branch
       }
-    }
+    };
     
-    return that
-  }
-

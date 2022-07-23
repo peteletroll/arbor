@@ -5,7 +5,7 @@
 //
 
   var Physics = function(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
-    var bhTree = BarnesHutTree() // for computing particle repulsion
+    var bhTree = new BarnesHutTree() // for computing particle repulsion
     var active = {particles:{}, springs:{}}
     var free = {particles:{}}
     var particles = []
