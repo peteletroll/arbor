@@ -4,7 +4,7 @@
 // the particle system itself. either run inline or in a worker (see worker.js)
 //
 
-  var Physics = function(dt, stiffness, repulsion, friction, updateFn, integrator){
+  var Physics = function(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
     var bhTree = BarnesHutTree() // for computing particle repulsion
     var active = {particles:{}, springs:{}}
     var free = {particles:{}}
@@ -23,7 +23,7 @@
       friction:(friction!==undefined)? friction : .3,
       gravity:false,
       dt:(dt!==undefined)? dt : 0.02,
-      theta:.4, // the criterion value for the barnes-hut s/d calculation
+      theta:(precision!==undefined) ? 1-precision : .4, // the criterion value for the barnes-hut s/d calculation
       
       init:function(){
         return that
@@ -197,8 +197,8 @@
         for (var id1 in active.particles) {
           var point1 = active.particles[id1];
           for (var id2 in active.particles) {
-            var point2 = active.particles[id2];
-            if (point1 !== point2){
+            if (id1 < id2) { // don't compute the same force twice
+              var point2 = active.particles[id2];
               var d = point1.p.subtract(point2.p);
               var distance = Math.max(1.0, d.magnitude());
               var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
@@ -207,10 +207,10 @@
               // (consult the cached `real' mass value if the mass is being poked to allow
               // for repositioning. the poked mass will still be used in .applyforce() so
               // all should be well)
-              point1.applyForce(direction.multiply(that.repulsion*(point2._m||point2.m)*.5)
-                                         .divide(distance * distance * 0.5) );
-              point2.applyForce(direction.multiply(that.repulsion*(point1._m||point1.m)*.5)
-                                         .divide(distance * distance * -0.5) );
+              var force = that.repulsion * (point1._m||point1.m) * (point2._m||point2.m)
+                / (distance * distance);
+              point1.applyForce(direction.multiply(force));
+              point2.applyForce(direction.multiply(-force));
             }
           }
         }
@@ -247,8 +247,10 @@
           // doesn't work very well though. what's the `right' way to do it?
 
           // apply force to each end point
-          spring.point1.applyForce(direction.multiply(spring.k * displacement * -0.5))
-          spring.point2.applyForce(direction.multiply(spring.k * displacement * 0.5))
+          // the 0.5 factor is physically wrong, but it's too old a bug to fix
+          var force = spring.k * displacement * 0.5;
+          spring.point1.applyForce(direction.multiply(-force))
+          spring.point2.applyForce(direction.multiply(force))
         }
       },
 
@@ -259,7 +261,7 @@
         var numParticles = 0
         var centroid = new Point(0,0)
         for (var id in active.particles) {
-          centroid.add(active.particles[id].p)
+          centroid = centroid.add(active.particles[id].p)
           numParticles++
         }
 
