@@ -600,6 +600,8 @@
     state.tween = state.kernel.tween || null
     
     // some magic attrs to make the Node objects phone-home their physics-relevant changes
+    var def = Object.defineProperty;
+
     Node.prototype.__defineGetter__("p", function() { 
       trace("GETTER p");
       var self = this
@@ -630,12 +632,17 @@
       state.kernel.particleModified(this._id, {_m:newM})
     })
       
-    Node.prototype.__defineGetter__("fixed", function() { trace("GETTER fixed"); return this._fixed; });
-    Node.prototype.__defineSetter__("fixed", function(isFixed) { 
-      trace("SETTER fixed");
-      this._fixed = isFixed
-      state.kernel.particleModified(this._id, {f:isFixed?1:0})
-    })
+    def(Node.prototype, "fixed", {
+      get: function() {
+        trace("GETTER fixed");
+        return this._fixed;
+      },
+      set: function(isFixed) {
+        trace("SETTER fixed");
+        this._fixed = isFixed;
+        state.kernel.particleModified(this._id, { f: isFixed ? 1 : 0 })
+      }
+    });
     
     return that
   }
