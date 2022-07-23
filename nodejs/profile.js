@@ -59,7 +59,7 @@ load("../src/dev.js");
 
 load("../demos/halfviz/src/parseur.js");
 
-var opts = { fps: 10000, precision: 0.6 };
+var opts = { fps: 10000, precision: 0.6, seconds: 20e3 };
 
 var argv = process.argv;
 var argp = 2;
@@ -96,7 +96,7 @@ system.renderer = {
 				"FPS", system.fps().toFixed(2),
 				"ENERGY", system.energy().sum.toPrecision(3));
 		}
-		if (now - start > 20e3)
+		if (now - start > 1000 * opts.seconds)
 			system.stop();
 	}
 };
