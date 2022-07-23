@@ -7,8 +7,6 @@
   var trace = function(msg){
     if (typeof(window)=='undefined' || !window.console) return
     var len = arguments.length
-    var args = []
-    for (var i=0; i<len; i++) args.push("arguments["+i+"]")
     console.log.apply(null, arguments)
   }  
 
