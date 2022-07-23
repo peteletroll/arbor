@@ -13,7 +13,6 @@ from __future__ import with_statement
 import sys
 import os
 import re
-from hashlib import md5
 from glob import glob
 from subprocess import Popen, PIPE
 from urllib2 import urlopen, Request
@@ -100,28 +99,6 @@ def render_file(target, **_vals):
   return tmpl_render(wrapper_tmpl, **vals)
 
 def compile(js, title=None, padding=10):
-  # do some caching so we're not constantly recompiling unchanged sourcefiles
-  def precompiled(md5sum, filename):
-    base = re.sub(r'.js$','',filename).replace('/','+')
-    hashfile = "%s-%s"%(base,md5sum)
-  
-    if os.path.exists('build/.o/%s'%hashfile):
-      print "-",filename.replace('.js','')
-      return file('build/.o/%s'%hashfile).read()
-
-    for fn in glob("build/.o/%s-*"%base):
-      os.unlink(fn)
-
-    return None
-
-  def postcompile(md5sum, src, filename):
-    if not os.path.exists('build/.o'): os.mkdir('build/.o')
-    base = re.sub(r'.js$','',filename).replace('/','+')
-    hashfile = "%s-%s"%(base,md5sum)
-
-    with file("build/.o/%s"%hashfile, 'w') as f:
-      f.write(src)
-  
   # for those last-minute s///g details...
   def filter_src(src, name):
     if 'kernel' in name:
@@ -142,9 +119,7 @@ def compile(js, title=None, padding=10):
     yui_input = js
   yui_input = filter_src(yui_input, title)
 
-  input_hash = md5(yui_input).hexdigest()
-  yui_output = precompiled(input_hash, title)
-  if not yui_output:
+  if True:
     print "+",title.replace('.js','')
     p = Popen(yui_cmd, shell=True, stdin=PIPE, stdout=PIPE, close_fds=True)
     (pin, pout) = (p.stdin, p.stdout)
@@ -153,8 +128,6 @@ def compile(js, title=None, padding=10):
     if not yui_output:
       print "Compilation failed (%s)"%title
       sys.exit(1)
-
-    postcompile(input_hash, yui_output, title)
 
 
 
