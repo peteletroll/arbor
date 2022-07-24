@@ -15,7 +15,6 @@ import os
 import re
 from glob import glob
 from subprocess import Popen, PIPE
-from urllib2 import urlopen, Request
 from datetime import datetime
 import shutil
 
@@ -40,7 +39,7 @@ def make_lib():
   }
 
   for target,deps in targets.items():
-    print target
+    print(target)
 
     padding = max(len(os.path.basename(fn)) for fn in deps + (['worker.js'] if 'kernel.js' in deps else []))
 
@@ -49,15 +48,15 @@ def make_lib():
 
     worker, worker_deps = make_worker(deps, padding)
     output_code = render_file(target, deps=deps_code, worker=worker, worker_deps=worker_deps)
-    with file("lib/%s"%target,"w") as f:
-      f.write(output_code)
-    print ""
+    with open("lib/%s"%target,"wb") as f:
+      f.write(output_code.encode("utf-8"))
+    print("")
 
 def make_worker(deps, padding):
   if 'kernel.js' not in deps: return "",""
 
   workerfile = "src/physics/worker.js"
-  driver = open(workerfile).read().strip()
+  driver = open(workerfile, "rb").read().decode("utf-8").strip()
 
   # strip out aliases
   m=re.search(r'^(.*)//.alias.*endalias.*?\n(.*)', driver, re.S)
@@ -79,19 +78,19 @@ def render_file(target, **_vals):
         m = tag_re.search(line)
         if m:
           ws = m.group(1)
-          padded_replacement = ws + val.replace("\n","\n%s"%ws)
+          padded_replacement = ws + val.replace("\n","\n"+ws)
           output.append(padded_replacement)
         else:
           output.append(line)
       lines = output
     return "\n".join(lines)
 
-  wrapper_tmpl = open("build/tmpl/%s"%target).read()
+  wrapper_tmpl = open("build/tmpl/%s"%target, "rb").read().decode("utf-8")
 
   vals = dict( (k.upper(),v) for k,v in _vals.items())
   dep_src = vals['DEPS']
   worker_src = vals['WORKER']
-  license_txt = open('build/tmpl/LICENSE').read().replace('{{YEAR}}',str(datetime.now().year))
+  license_txt = open('build/tmpl/LICENSE', "rb").read().decode("utf-8").replace('{{YEAR}}',str(datetime.now().year))
   if 'graphics' in target or 'tween' in target:
     vals['LICENSE'] = "\n".join([ln for ln in license_txt.split("\n") if 'springy.js' not in ln])
   else:
@@ -113,20 +112,20 @@ def compile(js, title=None, padding=10):
   # just return the text from the cached file.
   yui_cmd = "%s %s" % (YUI_PATH,YUI_OPTIONS)
   if os.path.exists(js): 
-    yui_input = open(js).read()
+    yui_input = open(js, "rb").read().decode("utf-8")
     title = os.path.basename(js)
   else: 
     yui_input = js
   yui_input = filter_src(yui_input, title)
 
   if True:
-    print "+",title.replace('.js','')
+    print("+ "+title.replace('.js',''))
     p = Popen(yui_cmd, shell=True, stdin=PIPE, stdout=PIPE, close_fds=True)
     (pin, pout) = (p.stdin, p.stdout)
-    pin.write(yui_input)
+    pin.write(yui_input.encode("utf-8"))
     yui_output=p.communicate()[0].strip()
     if not yui_output:
-      print "Compilation failed (%s)"%title
+      print("Compilation failed (%s)"%title)
       sys.exit(1)
 
 
