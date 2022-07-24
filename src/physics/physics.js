@@ -122,17 +122,18 @@
 
       tick:function(){
         this.tendParticles()
-        if (this.p.integrator=='euler'){
+        var p = this.p
+        if (p.integrator=='euler'){
           this.updateForces()
-          this.updateVelocity(this.p.dt)
-          this.updatePosition(this.p.dt)
+          this.updateVelocity(p.dt)
+          this.updatePosition(p.dt)
         }else{
           // default to verlet
           this.updateForces();
           this.cacheForces();           // snapshot f(t)
-          this.updatePosition(this.p.dt); // update position to x(t + 1)
+          this.updatePosition(p.dt); // update position to x(t + 1)
           this.updateForces();          // calculate f(t+1)
-          this.updateVelocity(this.p.dt); // update using f(t) and f(t+1)
+          this.updateVelocity(p.dt); // update using f(t) and f(t+1)
         }
         this.tock()
       },
@@ -171,13 +172,14 @@
 
       // Physics stuff
       updateForces:function() {
-        if (this.p.repulsion>0){
-          if (this.p.theta>0) this.applyBarnesHutRepulsion()
+        var p = this.p;
+        if (p.repulsion>0){
+          if (p.theta>0) this.applyBarnesHutRepulsion()
           else this.applyBruteForceRepulsion()
         }
-        if (this.p.stiffness>0) this.applySprings()
+        if (p.stiffness>0) this.applySprings()
         this.applyCenterDrift()
-        if (this.p.gravity) this.applyCenterGravity()
+        if (p.gravity) this.applyCenterGravity()
       },
 
       cacheForces:function() {
@@ -289,10 +291,11 @@
              continue
           }
 
-          if (this.p.integrator=='euler'){
-            point.v = point.v.add(point.f.multiply(timestep)).multiply(1-this.p.friction);
+          var p = this.p;
+          if (p.integrator=='euler'){
+            point.v = point.v.add(point.f.multiply(timestep)).multiply(1-p.friction);
           }else{
-            point.v = point.v.add(point.f.add(point._F.divide(point.m)).multiply(timestep*0.5)).multiply(1-this.p.friction);
+            point.v = point.v.add(point.f.add(point._F.divide(point.m)).multiply(timestep*0.5)).multiply(1-p.friction);
           }
           point.f.x = point.f.y = 0
 
