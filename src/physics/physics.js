@@ -4,19 +4,21 @@
 // the particle system itself. either run inline or in a worker (see worker.js)
 //
 
-  var Physics = function(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
-    var bhTree = new BarnesHutTree() // for computing particle repulsion
-    var active = {particles:{}, springs:{}}
-    var free = {particles:{}}
-    var particles = []
-    var springs = []
-    var _epoch=0
-    var _energy = {sum:0, max:0, mean:0}
-    var _bounds = {topleft:new Point(-1,-1), bottomright:new Point(1,1)}
+  "use strict";
+  function Physics(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
+    this.updateFn = updateFn
+    this.bhTree = new BarnesHutTree() // for computing particle repulsion
+    this.active = {particles:{}, springs:{}}
+    this.free = {particles:{}}
+    this.particles = []
+    this.springs = []
+    this._epoch=0
+    this._energy = {sum:0, max:0, mean:0}
+    this._bounds = {topleft:new Point(-1,-1), bottomright:new Point(1,1)}
 
-    var SPEED_LIMIT = 1000 // the max particle velocity per tick
-    
-    var that = {
+    this.SPEED_LIMIT = 1000 // the max particle velocity per tick
+
+    this.p = {
       integrator:['verlet','euler'].indexOf(integrator)>=0 ? integrator : 'verlet',
       stiffness:(stiffness!==undefined) ? stiffness : 1000,
       repulsion:(repulsion!==undefined)? repulsion : 600,
@@ -24,24 +26,24 @@
       gravity:false,
       dt:(dt!==undefined)? dt : 0.02,
       theta:(precision!==undefined) ? 1-precision : .4, // the criterion value for the barnes-hut s/d calculation
-      
-      init:function(){
-        return that
-      },
+    }
+  }
+
+  Physics.prototype = {
 
       modifyPhysics:function(param){
-        ['stiffness','repulsion','friction','gravity','dt','precision', 'integrator'].forEach(function(p){
+        ['stiffness','repulsion','friction','gravity','dt','precision', 'integrator'].forEach((p)=>{
           if (param[p]!==undefined){
             if (p=='precision'){
-              that.theta = 1-param[p]
+              this.p.theta = 1-param[p]
               return
             }
-            that[p] = param[p]
+            this.p[p] = param[p]
 
             if (p=='stiffness'){
               var stiff=param[p]
-              for (var id in active.springs) {
-                active.springs[id].k = stiff
+              for (var id in this.active.springs) {
+                this.active.springs[id].k = stiff
               }
             }
           }
@@ -52,37 +54,35 @@
         var id = c.id
         var mass = c.m
 
-        var w = _bounds.bottomright.x - _bounds.topleft.x
-        var h = _bounds.bottomright.y - _bounds.topleft.y
-        var randomish_pt = new Point((c.x != null) ? c.x: _bounds.topleft.x + w*Math.random(),
-                                     (c.y != null) ? c.y: _bounds.topleft.y + h*Math.random())
-
-        
-        active.particles[id] = new Particle(randomish_pt, mass);
-        active.particles[id].fixed = (c.f===1)
-        free.particles[id] = active.particles[id]
-        particles.push(active.particles[id])        
+        var w = this._bounds.bottomright.x - this._bounds.topleft.x
+        var h = this._bounds.bottomright.y - this._bounds.topleft.y
+        var randomish_pt = new Point((c.x != null) ? c.x: this._bounds.topleft.x + w*Math.random(),
+                                     (c.y != null) ? c.y: this._bounds.topleft.y + h*Math.random())
+        this.active.particles[id] = new Particle(randomish_pt, mass);
+        this.active.particles[id].fixed = (c.f===1)
+        this.free.particles[id] = this.active.particles[id]
+        this.particles.push(this.active.particles[id])
       },
 
       dropNode:function(c){
         var id = c.id
-        var dropping = active.particles[id]
-        var idx = particles.findIndex(function(e) { return e === dropping });
-        if (idx>-1) particles.splice(idx,1)
-        delete active.particles[id]
-        delete free.particles[id]
+        var dropping = this.active.particles[id]
+        var idx = this.particles.findIndex(function(e) { return e === dropping });
+        if (idx>-1) this.particles.splice(idx,1)
+        delete this.active.particles[id]
+        delete this.free.particles[id]
       },
 
       modifyNode:function(id, mods){
-        if (id in active.particles){
-          var pt = active.particles[id]
+        if (id in this.active.particles){
+          var pt = this.active.particles[id]
           if ('x' in mods) pt.p.x = mods.x
           if ('y' in mods) pt.p.y = mods.y
           if ('m' in mods) pt.m = mods.m
           if ('f' in mods) pt.fixed = (mods.f===1)
           if ('_m' in mods){
             if (pt._m===undefined) pt._m = pt.m
-            pt.m = mods._m            
+            pt.m = mods._m
           }
         }
       },
@@ -90,71 +90,68 @@
       addSpring:function(c){
         var id = c.id
         var length = c.l
-        var from = active.particles[c.fm]
-        var to = active.particles[c.to]
-        
+        var from = this.active.particles[c.fm]
+        var to = this.active.particles[c.to]
+
         if (from!==undefined && to!==undefined){
-          active.springs[id] = new Spring(from, to, length, that.stiffness)
-          springs.push(active.springs[id])
-          
-          delete free.particles[c.fm]
-          delete free.particles[c.to]
+          this.active.springs[id] = new Spring(from, to, length, this.p.stiffness)
+          this.springs.push(this.active.springs[id])
+
+          delete this.free.particles[c.fm]
+          delete this.free.particles[c.to]
         }
       },
 
       dropSpring:function(c){
         var id = c.id
-        var dropping = active.springs[id]
-        
-        var idx = springs.findIndex(function(e) { return e === dropping });
+        var dropping = this.active.springs[id]
+
+        var idx = this.springs.findIndex(function(e) { return e === dropping });
         if (idx>-1){
-           springs.splice(idx,1)
+           this.springs.splice(idx,1)
         }
-        delete active.springs[id]
+        delete this.active.springs[id]
       },
 
       _update:function(changes){
         // batch changes phoned in (automatically) by a ParticleSystem
-        _epoch++
-        
-        changes.forEach(function(c){
-          if (c.t in that) that[c.t](c)
-        })
-        return _epoch
+        this._epoch++
+        changes.forEach((c) => this[c.t](c))
+        return this._epoch
       },
 
       tick:function(){
-        that.tendParticles()
-        if (that.integrator=='euler'){
-          that.updateForces()
-          that.updateVelocity(that.dt)
-          that.updatePosition(that.dt)
+        this.tendParticles()
+        if (this.p.integrator=='euler'){
+          this.updateForces()
+          this.updateVelocity(this.p.dt)
+          this.updatePosition(this.p.dt)
         }else{
           // default to verlet
-          that.updateForces();
-          that.cacheForces();           // snapshot f(t)
-          that.updatePosition(that.dt); // update position to x(t + 1)
-          that.updateForces();          // calculate f(t+1)
-          that.updateVelocity(that.dt); // update using f(t) and f(t+1) 
+          this.updateForces();
+          this.cacheForces();           // snapshot f(t)
+          this.updatePosition(this.p.dt); // update position to x(t + 1)
+          this.updateForces();          // calculate f(t+1)
+          this.updateVelocity(this.p.dt); // update using f(t) and f(t+1)
         }
-        that.tock()
+        this.tock()
       },
 
       tock:function(){
         var coords = []
-        for (var id in active.particles) {
-          var pt = active.particles[id];
+        for (var id in this.active.particles) {
+          var pt = this.active.particles[id];
           coords.push(id)
           coords.push(pt.p.x)
           coords.push(pt.p.y)
         }
 
-        if (updateFn) updateFn({geometry:coords, epoch:_epoch, energy:_energy, bounds:_bounds})
+        if (this.updateFn) this.updateFn({geometry:coords, epoch:this._epoch, energy:this._energy, bounds:this._bounds})
       },
 
       tendParticles:function(){
-        for (var id in active.particles) {
-          var pt = active.particles[id];
+        for (var id in this.active.particles) {
+          var pt = this.active.particles[id];
           // decay down any of the temporary mass increases that were passed along
           // by using an {_m:} instead of an {m:} (which is to say via a Node having
           // its .tempMass attr set)
@@ -168,37 +165,35 @@
           }
 
           // zero out the velocity from one tick to the next
-          pt.v.x = pt.v.y = 0           
+          pt.v.x = pt.v.y = 0
         }
+      },
 
-      },
-      
-      
-      // Physics stuff      
+      // Physics stuff
       updateForces:function() {
-        if (that.repulsion>0){
-          if (that.theta>0) that.applyBarnesHutRepulsion()
-          else that.applyBruteForceRepulsion()
+        if (this.p.repulsion>0){
+          if (this.p.theta>0) this.applyBarnesHutRepulsion()
+          else this.applyBruteForceRepulsion()
         }
-        if (that.stiffness>0) that.applySprings()
-        that.applyCenterDrift()
-        if (that.gravity) that.applyCenterGravity()
+        if (this.p.stiffness>0) this.applySprings()
+        this.applyCenterDrift()
+        if (this.p.gravity) this.applyCenterGravity()
       },
-      
+
       cacheForces:function() {
         // keep a snapshot of the current forces for the verlet integrator
-        for (var id in active.particles) {
-           var point = active.particles[id];
+        for (var id in this.active.particles) {
+           var point = this.active.particles[id];
            point._F = point.f;
         }
       },
-      
+
       applyBruteForceRepulsion:function(){
-        for (var id1 in active.particles) {
-          var point1 = active.particles[id1];
-          for (var id2 in active.particles) {
+        for (var id1 in this.active.particles) {
+          var point1 = this.active.particles[id1];
+          for (var id2 in this.active.particles) {
             if (id1 < id2) { // don't compute the same force twice
-              var point2 = active.particles[id2];
+              var point2 = this.active.particles[id2];
               var d = point1.p.subtract(point2.p);
               var distance = Math.max(1.0, d.magnitude());
               var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
@@ -207,7 +202,7 @@
               // (consult the cached `real' mass value if the mass is being poked to allow
               // for repositioning. the poked mass will still be used in .applyforce() so
               // all should be well)
-              var force = that.repulsion * (point1._m||point1.m) * (point2._m||point2.m)
+              var force = this.p.repulsion * (point1._m||point1.m) * (point2._m||point2.m)
                 / (distance * distance);
               point1.applyForce(direction.multiply(force));
               point2.applyForce(direction.multiply(-force));
@@ -215,36 +210,36 @@
           }
         }
       },
-      
+
       applyBarnesHutRepulsion:function(){
-        if (!_bounds.topleft || !_bounds.bottomright) return
-        // if (Object.keys(active.particles).length < 2) return
-        if (!objlt(active.particles, 1)) return
-        var bottomright = _bounds.bottomright.clone();
-        var topleft = _bounds.topleft.clone();
+        if (!this._bounds.topleft || !this._bounds.bottomright) return
+        // if (Object.keys(this.active.particles).length < 2) return
+        if (!objlt(this.active.particles, 2)) return
+        var bottomright = this._bounds.bottomright.clone();
+        var topleft = this._bounds.topleft.clone();
 
         // build a barnes-hut tree...
-        bhTree.init(topleft, bottomright, that.theta)        
-        for (var id in active.particles) {
-          bhTree.insert(active.particles[id]);
+        this.bhTree.init(topleft, bottomright, this.p.theta)
+        for (var id in this.active.particles) {
+          this.bhTree.insert(this.active.particles[id]);
         }
-        
+
         // ...and use it to approximate the repulsion forces
-        for (var id in active.particles) {
-          bhTree.applyForces(active.particles[id], that.repulsion)
+        for (var id in this.active.particles) {
+          this.bhTree.applyForces(this.active.particles[id], this.p.repulsion)
         }
       },
-      
+
       applySprings:function(){
-        for (var id in active.springs) {
-          var spring = active.springs[id];
+        for (var id in this.active.springs) {
+          var spring = this.active.springs[id];
           var d = spring.point2.p.subtract(spring.point1.p); // the direction of the spring
           var displacement = spring.length - d.magnitude()//Math.max(.1, d.magnitude());
           var direction = ( (d.magnitude()>0) ? d : Point.random(1) ).normalize()
 
           // BUG:
           // since things oscillate wildly for hub nodes, should probably normalize spring
-          // forces by the number of incoming edges for each node. naive normalization 
+          // forces by the number of incoming edges for each node. naive normalization
           // doesn't work very well though. what's the `right' way to do it?
 
           // apply force to each end point
@@ -261,32 +256,32 @@
         // so the cloud is centered over the origin
         var numParticles = 0
         var centroid = new Point(0,0)
-        for (var id in active.particles) {
-          centroid = centroid.add(active.particles[id].p)
+        for (var id in this.active.particles) {
+          centroid = centroid.add(this.active.particles[id].p)
           numParticles++
         }
 
         if (numParticles < 2) return
-        
+
         var correction = centroid.divide(-numParticles)
-        for (var id in active.particles) {
-          active.particles[id].applyForce(correction)
+        for (var id in this.active.particles) {
+          this.active.particles[id].applyForce(correction)
         }
       },
       applyCenterGravity:function(){
         // attract each node to the origin
-        for (var id in active.particles) {
-          var point = active.particles[id];
+        for (var id in this.active.particles) {
+          var point = this.active.particles[id];
           var direction = point.p.multiply(-1.0);
-          point.applyForce(direction.multiply(that.repulsion / 100.0));
+          point.applyForce(direction.multiply(this.p.repulsion / 100.0));
         }
       },
-      
+
       updateVelocity:function(timestep){
         // translate forces to a new velocity for this particle
         var sum=0, max=0, n = 0;
-        for (var id in active.particles) {
-          var point = active.particles[id];
+        for (var id in this.active.particles) {
+          var point = this.active.particles[id];
           if (point.fixed){
              point.v = new Point(0,0)
              point.f = new Point(0,0)
@@ -294,15 +289,15 @@
              continue
           }
 
-          if (that.integrator=='euler'){
-            point.v = point.v.add(point.f.multiply(timestep)).multiply(1-that.friction);
+          if (this.p.integrator=='euler'){
+            point.v = point.v.add(point.f.multiply(timestep)).multiply(1-this.p.friction);
           }else{
-            point.v = point.v.add(point.f.add(point._F.divide(point.m)).multiply(timestep*0.5)).multiply(1-that.friction);
+            point.v = point.v.add(point.f.add(point._F.divide(point.m)).multiply(timestep*0.5)).multiply(1-this.p.friction);
           }
           point.f.x = point.f.y = 0
 
-          var speed = point.v.magnitude()          
-          if (speed>SPEED_LIMIT) point.v = point.v.divide(speed*speed)
+          var speed = point.v.magnitude()
+          if (speed>this.SPEED_LIMIT) point.v = point.v.divide(speed*speed)
 
           var speed = point.v.magnitude();
           var e = speed*speed
@@ -310,24 +305,24 @@
           max = Math.max(e,max)
           n++
         }
-        _energy = {sum:sum, max:max, mean:sum/n, n:n}
-        
+        this._energy = {sum:sum, max:max, mean:sum/n, n:n}
+
       },
 
       updatePosition:function(timestep){
         // translate velocity to a position delta
         var bottomright = null
-        var topleft = null        
-        
-        for (var i in active.particles) {
-          var point = active.particles[i];
+        var topleft = null
+
+        for (var i in this.active.particles) {
+          var point = this.active.particles[i];
           // really force fixed point to stay fixed, to combat center drift effects
           if (point.fixed){
              point.v = new Point(0,0);
              point.f = new Point(0,0);
           }
           // move the node to its new position
-          if (that.integrator=='euler'){
+          if (this.p.integrator=='euler'){
             point.p = point.p.add(point.v.multiply(timestep));
           }else{
             //this should follow the equation
@@ -335,30 +330,26 @@
             var accel = point.f.multiply(0.5 * timestep * timestep).divide(point.m);
             point.p = point.p.add(point.v.multiply(timestep)).add(accel);
           }
-          
+
           if (!bottomright){
             bottomright = new Point(point.p.x, point.p.y)
             topleft = new Point(point.p.x, point.p.y)
             continue
           }
-        
+
           var pt = point.p
           if (pt.x===null || pt.y===null) return
           if (pt.x > bottomright.x) bottomright.x = pt.x;
-          if (pt.y > bottomright.y) bottomright.y = pt.y;          
+          if (pt.y > bottomright.y) bottomright.y = pt.y;
           if (pt.x < topleft.x)     topleft.x = pt.x;
           if (pt.y < topleft.y)     topleft.y = pt.y;
         }
-        
-        _bounds = {topleft:topleft||new Point(-1,-1), bottomright:bottomright||new Point(1,1)}
+
+        this._bounds = {topleft:topleft||new Point(-1,-1), bottomright:bottomright||new Point(1,1)}
       },
 
       systemEnergy:function(timestep){
         // system stats
-        return _energy
+        return this._energy
       }
-
-      
-    }
-    return that.init()
   }

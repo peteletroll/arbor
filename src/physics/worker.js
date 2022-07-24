@@ -20,7 +20,7 @@ var PhysicsWorker = function(){
   var that = {  
     init:function(param){
       that.timeout(param.timeout)
-      _physics = Physics(param.dt, param.stiffness, param.repulsion, param.friction, that.tock)
+      _physics = new Physics(param.dt, param.stiffness, param.repulsion, param.friction, that.tock)
       return that
     },
     timeout:function(newTimeout){
