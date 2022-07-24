@@ -117,11 +117,14 @@
     }
   }
 
-  var objkeys = function(obj){
-    var keys = []
-    $.each(obj, function(k,v){ if (obj.hasOwnProperty(k)) keys.push(k) })
-    return keys
+  var objlt = function(obj, keys){
+    for (var k in obj)
+      if (keys-- <= 0)
+        return true
+    return false
   }
+
+  var objkeys = Object.keys
   
   var objcontains = function(obj){
     if (!obj || typeof obj!='object') return false
