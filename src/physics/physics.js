@@ -362,11 +362,3 @@
     }
     return that.init()
   }
-  
-  var _nearParticle = function(center_pt, r){
-      var r = r || .0
-      var x = center_pt.x
-      var y = center_pt.y
-      var d = r*2
-      return new Point(x-r+Math.random()*d, y-r+Math.random()*d)
-  }
