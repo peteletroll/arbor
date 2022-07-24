@@ -14,6 +14,7 @@ import sys
 import os
 import re
 from glob import glob
+from io import open
 from subprocess import Popen, PIPE
 from datetime import datetime
 import shutil
@@ -122,8 +123,8 @@ def compile(js, title=None, padding=10):
     print("+ "+title.replace('.js',''))
     p = Popen(yui_cmd, shell=True, stdin=PIPE, stdout=PIPE, close_fds=True)
     (pin, pout) = (p.stdin, p.stdout)
-    pin.write(yui_input)
-    yui_output=p.communicate()[0].strip()
+    pin.write(yui_input.encode("utf-8"))
+    yui_output=p.communicate()[0].decode("utf-8").strip()
     if not yui_output:
       print("Compilation failed (%s)"%title)
       sys.exit(1)
