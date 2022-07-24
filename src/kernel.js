@@ -10,9 +10,7 @@
                             navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
     this.USE_WORKER = (window.Worker !== undefined && !chrome_local_file && pSystem.parameters().worker)
     
-    this.pSystem = pSystem;
     this._physics = null
-    this._tween = null
     this._fpsWindow = [] // for keeping track of the actual frame rate
     this._fpsWindow.last = Date.now()
     this._screenInterval = null
@@ -31,13 +29,12 @@
     
   Kernel.prototype = {
       init:function(){ 
-        if (typeof(Tween)!='undefined') this._tween = Tween()
-        else if (typeof(arbor.Tween)!='undefined') this._tween = arbor.Tween()
-        else var _tween = this._tween = {busy:function(){return false},
+        if (typeof(Tween)!='undefined') this.tween = Tween()
+        else if (typeof(arbor.Tween)!='undefined') this.tween = arbor.Tween()
+        else var tween = this.tween = {busy:function(){return false},
                        tick:function(){return true},
-                       to:function(){ trace('Please include arbor-tween.js to enable tweens'); _tween.to=function(){}; return} }
-        this.tween = this._tween
-        var params = this.pSystem.parameters()
+                       to:function(){ trace('Please include arbor-tween.js to enable tweens'); tween.to=function(){}; return} }
+        var params = this.system.parameters()
                 
         if(this.USE_WORKER){
           trace('arbor.js/web-workers',params)
@@ -132,7 +129,7 @@
           shouldRedraw = true
         }
         
-        if (this._tween && this._tween.busy()) shouldRedraw = true
+        if (this.tween && this.tween.busy()) shouldRedraw = true
 
         if (this.system._updateBounds(this._lastBounds)) shouldRedraw=true
         
@@ -145,7 +142,7 @@
                this._attached = render
             }          
             
-            if (this._tween) this._tween.tick()
+            if (this.tween) this.tween.tick()
             render.redraw()
 
             var _fpsWindow = this._fpsWindow
@@ -160,11 +157,11 @@
       // 
       // the main render loop when running in non-worker mode
       physicsUpdate:function(){
-        if (this._tween) this._tween.tick()
+        if (this.tween) this.tween.tick()
         this._physics.tick()
 
         var stillActive = this.system._updateBounds()
-        if (this._tween && this._tween.busy()) stillActive = true
+        if (this.tween && this.tween.busy()) stillActive = true
 
         var render = this.system.renderer
         var now = Date.now()
