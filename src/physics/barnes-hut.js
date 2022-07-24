@@ -15,7 +15,7 @@
     this.theta = .5
     this.queue = new Queue();
   }
-    
+
     BarnesHutTree.prototype = {
       init:function(topleft, bottomright, theta){
         this.theta = theta
@@ -26,7 +26,7 @@
         this.root.origin = topleft
         this.root.size = bottomright.subtract(topleft)
       },
-      
+
       insert:function(newParticle){
         // add a particle to the tree, starting at the current root and working down
         var node = this.root
@@ -47,14 +47,13 @@
             }else{
               node.p = particle.p.multiply(p_mass)
             }
-            
           }else if ('origin' in node[p_quad]){
             // slot contains a branch node, keep iterating with the branch
             // as our new root
             node.mass += (p_mass)
             if (node.p) node.p = node.p.add(particle.p.multiply(p_mass))
             else node.p = particle.p.multiply(p_mass)
-            
+
             node = node[p_quad]
             queue.unshift(particle)
           }else{
@@ -86,13 +85,13 @@
               // have identical coordinates by jostling one of them slightly
               var x_spread = branch_size.x*.08
               var y_spread = branch_size.y*.08
-              oldParticle.p.x = Math.min(branch_origin.x+branch_size.x,  
-                                         Math.max(branch_origin.x,  
-                                                  oldParticle.p.x - x_spread/2 + 
+              oldParticle.p.x = Math.min(branch_origin.x+branch_size.x,
+                                         Math.max(branch_origin.x,
+                                                  oldParticle.p.x - x_spread/2 +
                                                   Math.random()*x_spread))
-              oldParticle.p.y = Math.min(branch_origin.y+branch_size.y,  
-                                         Math.max(branch_origin.y,  
-                                                  oldParticle.p.y - y_spread/2 + 
+              oldParticle.p.y = Math.min(branch_origin.y+branch_size.y,
+                                         Math.max(branch_origin.y,
+                                                  oldParticle.p.y - y_spread/2 +
                                                   Math.random()*y_spread))
             }
 
@@ -116,7 +115,7 @@
           var node = queue.shift()
           if (node===undefined) continue
           if (particle===node) continue
-          
+
           if ('f' in node){
             // this is a particle leafnode, so just apply the force directly
             var d = particle.p.subtract(node.p);
@@ -149,7 +148,7 @@
           }
         }
       },
-      
+
       whichQuad:function(particle, node){
         // sort the particle into one of the quadrants of this node
         if (particle.p.exploded()) return null
@@ -163,7 +162,7 @@
           else return 'se'
         }
       },
-      
+
       newBranch:function(){
         // to prevent a gc horrorshow, recycle the tree nodes between iterations
         if (this.branches[this.branchCtr]){
@@ -172,7 +171,7 @@
           branch.mass = 0
           branch.p = undefined
         }else{
-          branch = {origin:null, size:null, 
+          branch = {origin:null, size:null,
                     nw:undefined, ne:undefined, sw:undefined, se:undefined, mass:0, p:undefined}
           this.branches[this.branchCtr] = branch
         }
@@ -181,4 +180,4 @@
         return branch
       }
     };
-    
+

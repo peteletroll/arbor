@@ -5,19 +5,19 @@
 // Kernel object can deal with
 //
 importScripts('atoms.js');
-importScripts('barnes-hut.js');  
-importScripts('physics.js');  
+importScripts('barnes-hut.js');
+importScripts('physics.js');
 
 var PhysicsWorker = function(){
   var _timeout = 20
   var _physics = null
   var _physicsInterval = null
   var _lastTick = null
-  
+
   var times = []
   var last = Date.now()
-  
-  var that = {  
+
+  var that = {
     init:function(param){
       that.timeout(param.timeout)
       _physics = new Physics(param.dt, param.stiffness, param.repulsion, param.friction, that.tock)
@@ -47,8 +47,7 @@ var PhysicsWorker = function(){
     },
     tick:function(){
       // iterate the system
-      _physics.tick()    
-
+      _physics.tick()
 
       // but stop the simulation when energy of the system goes below a threshold
       var sysEnergy = _physics.systemEnergy()
@@ -62,28 +61,27 @@ var PhysicsWorker = function(){
       }else{
         _lastTick = null
       }
-      
     },
 
     tock:function(sysData){
       sysData.type = "geometry"
       postMessage(sysData)
     },
-    
+
     modifyNode:function(id, mods){
-      _physics.modifyNode(id, mods)  
+      _physics.modifyNode(id, mods)
       that.go()
     },
 
     modifyPhysics:function(param){
       _physics.modifyPhysics(param)
     },
-    
+
     update:function(changes){
       var epoch = _physics._update(changes)
     }
   }
-  
+
   return that
 }
 
@@ -95,13 +93,13 @@ onmessage = function(e){
     postMessage("¿kérnèl?")
     return
   }
-  
+
   if (e.data.type=='physics'){
     var param = e.data.physics
     physics.init(e.data.physics)
     return
   }
-  
+
   switch(e.data.type){
     case "modify":
       physics.modifyNode(e.data.id, e.data.mods)
@@ -111,20 +109,20 @@ onmessage = function(e){
       physics.update(e.data.changes)
       physics.go()
       break
-      
+
     case "start":
       physics.go()
       break
-      
+
     case "stop":
       physics.stop()
       break
-      
+
     case "sys":
       var param = e.data.param || {}
       if (!isNaN(param.timeout)) physics.timeout(param.timeout)
       physics.modifyPhysics(param)
       physics.go()
       break
-    }  
+    }
 }

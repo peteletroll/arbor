@@ -1,12 +1,12 @@
 //
 // system.js
 //
-// the main controller object for creating/modifying graphs 
+// the main controller object for creating/modifying graphs
 //
 
   var ParticleSystem = function(repulsion, stiffness, friction, centerGravity, targetFps, dt, precision, integrator, worker){
   // also callable with ({integrator:, stiffness:, repulsion:, friction:, timestep:, fps:, dt:, gravity:, worker:})
-    
+
     var _changes=[]
     var _notification=null
     var _epoch = 0
@@ -96,7 +96,7 @@
           // by the simulation:
           //   'mass' overrides the default of 1
           //   'fixed' overrides the default of false
-          //   'x' & 'y' will set a starting position rather than 
+          //   'x' & 'y' will set a starting position rather than
           //             defaulting to random placement
           var x = (data.x!=undefined) ? data.x : null
           var y = (data.y!=undefined) ? data.y : null
@@ -117,7 +117,7 @@
       // remove a node and its associated edges from the graph
       pruneNode:function(nodeOrName) {
         var node = that.getNode(nodeOrName)
-        
+
         if (typeof(state.nodes[node._id]) !== 'undefined'){
           delete state.nodes[node._id]
           delete state.names[node.name]
@@ -188,7 +188,7 @@
 
         _changes.push({t:"dropSpring", id:edge._id})
         delete state.edges[edge._id]
-        
+
         for (var x in state.adjacency){
           for (var y in state.adjacency[x]){
             var edges = state.adjacency[x][y];
@@ -209,7 +209,7 @@
         node1 = that.getNode(node1)
         node2 = that.getNode(node2)
         if (!node1 || !node2) return []
-        
+
         if (typeof(state.adjacency[node1._id]) !== 'undefined'
           && typeof(state.adjacency[node1._id][node2._id]) !== 'undefined'){
           return state.adjacency[node1._id][node2._id];
@@ -221,7 +221,7 @@
       getEdgesFrom:function(node) {
         node = that.getNode(node)
         if (!node) return []
-        
+
         if (typeof(state.adjacency[node._id]) !== 'undefined'){
           var nodeEdges = []
           for (var id in state.adjacency[node._id]) { // WAS-EACH
@@ -243,7 +243,7 @@
           var edge = state.edges[edgeId];
           if (edge.target == node) nodeEdges.push(edge)
         }
-        
+
         return nodeEdges;
       },
 
@@ -254,12 +254,11 @@
           var p1 = state.nodes[e.source._id]._p
           var p2 = state.nodes[e.target._id]._p
 
-
           if (p1.x==null || p2.x==null) continue
-          
+
           p1 = (_screenSize!==null) ? that.toScreen(p1) : p1
           p2 = (_screenSize!==null) ? that.toScreen(p2) : p2
-          
+
           if (p1 && p2) callback.call(that, e, p1, p2);
         }
       },
@@ -287,9 +286,9 @@
         // trace('prune', changes.dropped)
         return changes
       },
-      
+
       graft:function(branch){
-        // branch is of the form: { nodes:{name1:{d}, name2:{d},...}, 
+        // branch is of the form: { nodes:{name1:{d}, name2:{d},...},
         //                          edges:{fromNm:{toNm1:{d}, toNm2:{d}}, ...} }
 
         var changes = {added:{nodes:[], edges:[]}}
@@ -298,13 +297,13 @@
           var oldNode = that.getNode(name)
           // should probably merge any x/y/m data as well...
           // if (oldNode) $.extend(oldNode.data, nodeData)
-          
+
           if (oldNode) oldNode.data = nodeData
           else changes.added.nodes.push( that.addNode(name, nodeData) )
-          
+
           state.kernel.start()
         }
-        
+
         if (branch.edges) for (var src in branch.edges) { // WAS-EACH
           var dsts = branch.edges[src];
           var srcNode = that.getNode(src)
@@ -348,24 +347,24 @@
                 changes.dropped.edges.push(edge)
               }
         }
-        
+
         var prune_changes = that.prune(function(node, edges){
           if (branch.nodes[node.name] === undefined){
             changes.dropped.nodes.push(node)
             return true
           }
         })
-        var graft_changes = that.graft(branch)        
+        var graft_changes = that.graft(branch)
         changes.added.nodes = changes.added.nodes.concat(graft_changes.added.nodes)
         changes.added.edges = changes.added.edges.concat(graft_changes.added.edges)
         changes.dropped.nodes = changes.dropped.nodes.concat(prune_changes.dropped.nodes)
         changes.dropped.edges = changes.dropped.edges.concat(prune_changes.dropped.edges)
-        
+
         // trace('changes', changes)
         return changes
       },
 
-      
+
       tweenNode:function(nodeOrName, dur, to){
         var node = that.getNode(nodeOrName)
         if (node) state.tween.to(node, dur, to)
@@ -389,7 +388,7 @@
       },
 
       _updateGeometry:function(e){
-        if (e != undefined){          
+        if (e != undefined){
           var stale = (e.epoch<_epoch)
 
           _energy = e.energy
@@ -397,27 +396,27 @@
           if (pts!==undefined){
             for (var i=0, j=pts.length/3; i<j; i++){
               var id = pts[3*i]
-                            
+
               // canary silencer...
               if (stale && state.nodes[id]==undefined) continue
-              
+
               state.nodes[id]._p.x = pts[3*i + 1]
               state.nodes[id]._p.y = pts[3*i + 2]
             }
-          }          
+          }
         }
       },
-      
+
       // convert to/from screen coordinates
       screen:function(opts){
-        if (opts == undefined) return {size:(_screenSize)? objcopy(_screenSize) : undefined, 
-                                       padding:_screenPadding.concat(), 
+        if (opts == undefined) return {size:(_screenSize)? objcopy(_screenSize) : undefined,
+                                       padding:_screenPadding.concat(),
                                        step:_screenStep}
         if (opts.size!==undefined) that.screenSize(opts.size.width, opts.size.height)
         if (!isNaN(opts.step)) that.screenStep(opts.step)
         if (opts.padding!==undefined) that.screenPadding(opts.padding)
       },
-      
+
       screenSize:function(canvasWidth, canvasHeight){
         _screenSize = {width:canvasWidth,height:canvasHeight}
         that._updateBounds()
@@ -432,7 +431,7 @@
         var bot = trbl[2]
         if (right===undefined) trbl = [top,top,top,top]
         else if (bot==undefined) trbl = [top,right,top,right]
-        
+
         _screenPadding = trbl
       },
 
@@ -452,7 +451,7 @@
         // return arbor.Point(Math.floor(sx), Math.floor(sy))
         return arbor.Point(sx, sy)
       },
-      
+
       fromScreen:function(s) {
         if (!_bounds || !_screenSize) return
 
@@ -467,12 +466,12 @@
       _updateBounds:function(newBounds){
         // step the renderer's current bounding box closer to the true box containing all
         // the nodes. if _screenStep is set to 1 there will be no lag. if _screenStep is
-        // set to 0 the bounding box will remain stationary after being initially set 
+        // set to 0 the bounding box will remain stationary after being initially set
         if (_screenSize===null) return
-        
+
         if (newBounds) _boundsTarget = newBounds
         else _boundsTarget = that.bounds()
-        
+
         // _boundsTarget = newBounds || that.bounds()
         // _boundsTarget.topleft = new Point(_boundsTarget.topleft.x,_boundsTarget.topleft.y)
         // _boundsTarget.bottomright = new Point(_boundsTarget.bottomright.x,_boundsTarget.bottomright.y)
@@ -496,21 +495,21 @@
           _bounds = _boundsTarget
           return true
         }
-        
+
         // var stepSize = (Math.max(dims.x,dims.y)<MINSIZE) ? .2 : _screenStep
         var stepSize = _screenStep
         _newBounds = {
           bottomright: _bounds.bottomright.add( _boundsTarget.bottomright.subtract(_bounds.bottomright).multiply(stepSize) ),
           topleft: _bounds.topleft.add( _boundsTarget.topleft.subtract(_bounds.topleft).multiply(stepSize) )
         }
-        
+
         // return true if we're still approaching the target, false if we're ‘close enough’
-        var diff = new Point(_bounds.topleft.subtract(_newBounds.topleft).magnitude(), _bounds.bottomright.subtract(_newBounds.bottomright).magnitude())        
+        var diff = new Point(_bounds.topleft.subtract(_newBounds.topleft).magnitude(), _bounds.bottomright.subtract(_newBounds.bottomright).magnitude())
         if (diff.x*_screenSize.width>1 || diff.y*_screenSize.height>1){
           _bounds = _newBounds
           return true
         }else{
-         return false        
+         return false
         }
       },
 
@@ -533,15 +532,14 @@
             topleft = node._p.clone();
             continue
           }
-        
+
           var point = node._p
           if (point.x===null || point.y===null) continue
           if (point.x > bottomright.x) bottomright.x = point.x;
-          if (point.y > bottomright.y) bottomright.y = point.y;          
+          if (point.y > bottomright.y) bottomright.y = point.y;
           if   (point.x < topleft.x)   topleft.x = point.x;
           if   (point.y < topleft.y)   topleft.y = point.y;
         }
-
 
         // return the true range then let to/fromScreen handle the padding
         if (bottomright && topleft){
@@ -556,10 +554,10 @@
         if (_screenSize!==null) pos = that.fromScreen(pos)
         // if screen size has been specified, presume pos is in screen pixel
         // units and convert it back to the particle system coordinates
-        
+
         var min = {node: null, point: null, distance: null};
         var t = that;
-        
+
         for (var id in state.nodes) { // WAS-EACH
           var node = state.nodes[id];
           var pt = node._p
@@ -570,7 +568,7 @@
             if (_screenSize!==null) min.screenPoint = that.toScreen(pt)
           }
         }
-        
+
         if (min.node){
           if (_screenSize!==null) min.distance = that.toScreen(min.node.p).subtract(that.toScreen(pos)).magnitude()
            return min
@@ -584,7 +582,7 @@
         // (using a short timeout to batch changes)
         if (_notification===null) _epoch++
         else clearTimeout(_notification)
-        
+
         _notification = setTimeout(that._synchronize,20)
         // that._synchronize()
       },
@@ -595,11 +593,11 @@
           _notification = null
         }
       }
-    }    
-    
+    }
+
     state.kernel = new Kernel(that)
     state.tween = state.kernel.tween || null
-    
+
     // some magic attrs to make the Node objects phone-home their physics-relevant changes
     var def = Object.defineProperty;
 

@@ -251,7 +251,6 @@
         }
       },
 
-
       applyCenterDrift:function(){
         // find the centroid of all the particles in the system and shift everything
         // so the cloud is centered over the origin
@@ -269,6 +268,7 @@
           this.active.particles[id].applyForce(correction)
         }
       },
+
       applyCenterGravity:function(){
         // attract each node to the origin
         for (var id in this.active.particles) {

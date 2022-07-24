@@ -5,12 +5,12 @@
 //
 
 var Node = function(data){
-	this._id = _nextNodeId++; // simple ints to allow the Kernel & ParticleSystem to chat
-	this.data = data || {};  // the user-serviceable parts
-	this._mass = (data.mass!==undefined) ? data.mass : 1
-	this._fixed = (data.fixed===true) ? true : false
-	this._p = new Point((typeof(data.x)=='number') ? data.x : null, 
-                     (typeof(data.y)=='number') ? data.y : null)
+  this._id = _nextNodeId++; // simple ints to allow the Kernel & ParticleSystem to chat
+  this.data = data || {};  // the user-serviceable parts
+  this._mass = (data.mass!==undefined) ? data.mass : 1
+  this._fixed = (data.fixed===true) ? true : false
+  this._p = new Point((typeof(data.x)=='number') ? data.x : null,
+                      (typeof(data.y)=='number') ? data.y : null)
   delete this.data.x
   delete this.data.y
   delete this.data.mass
