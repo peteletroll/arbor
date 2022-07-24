@@ -4,7 +4,6 @@
 // the particle system itself. either run inline or in a worker (see worker.js)
 //
 
-  "use strict";
   function Physics(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
     this.updateFn = updateFn
     this.bhTree = new BarnesHutTree() // for computing particle repulsion
