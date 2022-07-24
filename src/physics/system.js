@@ -597,7 +597,7 @@
       }
     }    
     
-    state.kernel = Kernel(that)
+    state.kernel = new Kernel(that)
     state.tween = state.kernel.tween || null
     
     // some magic attrs to make the Node objects phone-home their physics-relevant changes
