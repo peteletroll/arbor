@@ -13,23 +13,16 @@ from __future__ import with_statement
 import sys
 import os
 import re
-from hashlib import md5
 from glob import glob
+from io import open
 from subprocess import Popen, PIPE
-from urllib2 import urlopen, Request
 from datetime import datetime
 import shutil
 
 
-# apparently there is no stable download link for <most-recent-version> of 
-# yui, so this could url well be stale. if so you can try looking for a 
-# new link at: http://yuilibrary.com/downloads/#yuicompressor
-YUI_LIB_URL = "http://yui.zenfs.com/releases/yuicompressor/yuicompressor-2.4.6.zip"
-
 # your system configuration may vary...
-YUI_PATH = "/usr/local/bin/yui"
-YUI_OPTIONS = "--type=js"
-# YUI_OPTIONS = "--nomunge --disable-optimizations --type=js"
+YUI_PATH = "uglifyjs"
+YUI_OPTIONS = "--compress --mangle"
 
 
 
@@ -47,7 +40,7 @@ def make_lib():
   }
 
   for target,deps in targets.items():
-    print target
+    print(target)
 
     padding = max(len(os.path.basename(fn)) for fn in deps + (['worker.js'] if 'kernel.js' in deps else []))
 
@@ -56,9 +49,9 @@ def make_lib():
 
     worker, worker_deps = make_worker(deps, padding)
     output_code = render_file(target, deps=deps_code, worker=worker, worker_deps=worker_deps)
-    with file("lib/%s"%target,"w") as f:
+    with open("lib/%s"%target,"w") as f:
       f.write(output_code)
-    print ""
+    print("")
 
 def make_worker(deps, padding):
   if 'kernel.js' not in deps: return "",""
@@ -106,28 +99,6 @@ def render_file(target, **_vals):
   return tmpl_render(wrapper_tmpl, **vals)
 
 def compile(js, title=None, padding=10):
-  # do some caching so we're not constantly recompiling unchanged sourcefiles
-  def precompiled(md5sum, filename):
-    base = re.sub(r'.js$','',filename).replace('/','+')
-    hashfile = "%s-%s"%(base,md5sum)
-  
-    if os.path.exists('build/.o/%s'%hashfile):
-      print "-",filename.replace('.js','')
-      return file('build/.o/%s'%hashfile).read()
-
-    for fn in glob("build/.o/%s-*"%base):
-      os.unlink(fn)
-
-    return None
-
-  def postcompile(md5sum, src, filename):
-    if not os.path.exists('build/.o'): os.mkdir('build/.o')
-    base = re.sub(r'.js$','',filename).replace('/','+')
-    hashfile = "%s-%s"%(base,md5sum)
-
-    with file("build/.o/%s"%hashfile, 'w') as f:
-      f.write(src)
-  
   # for those last-minute s///g details...
   def filter_src(src, name):
     if 'kernel' in name:
@@ -148,19 +119,15 @@ def compile(js, title=None, padding=10):
     yui_input = js
   yui_input = filter_src(yui_input, title)
 
-  input_hash = md5(yui_input).hexdigest()
-  yui_output = precompiled(input_hash, title)
-  if not yui_output:
-    print "+",title.replace('.js','')
+  if True:
+    print("+ "+title.replace('.js',''))
     p = Popen(yui_cmd, shell=True, stdin=PIPE, stdout=PIPE, close_fds=True)
     (pin, pout) = (p.stdin, p.stdout)
-    pin.write(yui_input)
-    yui_output=p.communicate()[0].strip()
+    pin.write(yui_input.encode("utf-8"))
+    yui_output=p.communicate()[0].decode("utf-8").strip()
     if not yui_output:
-      print "Compilation failed (%s)"%title
+      print("Compilation failed (%s)"%title)
       sys.exit(1)
-
-    postcompile(input_hash, yui_output, title)
 
 
 
@@ -171,42 +138,7 @@ def compile(js, title=None, padding=10):
     return yui_output
   
 
-def get_yui():
-  from zipfile import ZipFile
-  from cStringIO import StringIO
-
-  print "fetching yui compressor"
-  data = urlopen(YUI_LIB_URL)
-  yuizip = ZipFile(StringIO(data.read()))
-  jarpath = [f for f in yuizip.namelist() if 'build/yuicompressor' in f][0]
-  
-  if not os.path.exists('.yui'): os.mkdir('.yui')
-  jardata = yuizip.open(jarpath).read()
-  with file('.yui/%s'%os.path.basename(jarpath),'w') as f:
-    f.write(jardata)
-  print "placed jar at",'.yui/%s'%os.path.basename(jarpath)
-  
-  binfile = "#!/bin/sh\n\njava -jar %s $@\n" % os.path.abspath('.yui/'+os.path.basename(jarpath))
-  with file('yui','wb') as f:
-    f.write(binfile)
-  os.chmod('yui',0755)
-  print "created yui script in current dir\n"
-  
-  
 def main():
-  global YUI_PATH
-  YUI_PATH = os.path.abspath(YUI_PATH)
-  if not os.path.exists(YUI_PATH):
-    if not os.path.exists('./yui'):
-      
-      should_get = raw_input('Can\'t find the YUI compresser.\nTry fetching a copy? (y/n) ')
-      if should_get.lower().startswith('y'):
-        get_yui()
-      else:
-        print "Please adjust the YUI_PATH variable in the script to point to the proper command"
-        sys.exit(1)
-    YUI_PATH = os.path.abspath('./yui')
-
   os.chdir("%s/.."%os.path.dirname(os.path.abspath(__file__)))
   make_lib()
 

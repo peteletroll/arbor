@@ -218,7 +218,8 @@
       
       applyBarnesHutRepulsion:function(){
         if (!_bounds.topleft || !_bounds.bottomright) return
-        if (Object.keys(active.particles).length < 2) return
+        // if (Object.keys(active.particles).length < 2) return
+        if (!objlt(active.particles, 1)) return
         var bottomright = _bounds.bottomright.clone();
         var topleft = _bounds.topleft.clone();
 

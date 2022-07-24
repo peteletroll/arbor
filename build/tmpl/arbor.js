@@ -29,6 +29,7 @@
       ordinalize:ordinalize,    // ƒ(num) -> abbrev integers (and add commas)
       objcopy:objcopy,          // ƒ(old) -> clone an object
       objcmp:objcmp,            // ƒ(a, b, strict_ordering) -> t/f comparison
+      objlt:objlt,              // ƒ(obj, num) -> obj has more than num keys
       objkeys:objkeys,          // ƒ(obj) -> array of all keys in obj
       objmerge:objmerge,        // ƒ(dst, src) -> like $.extend but non-destructive
       uniq:uniq,                // ƒ(arr) -> array of unique items in arr

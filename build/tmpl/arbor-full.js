@@ -34,6 +34,7 @@
       ordinalize:ordinalize,    // ƒ(num) -> abbrev integers (and add commas)
       objcopy:objcopy,          // ƒ(old) -> clone an object
       objcmp:objcmp,            // ƒ(a, b, strict_ordering) -> t/f comparison
+      objlt:objlt,              // ƒ(obj, num) -> obj has more than num keys
       objkeys:objkeys,          // ƒ(obj) -> array of all keys in obj
       uniq:uniq,                // ƒ(arr) -> array of unique items in arr
       arbor_path:arbor_path     // ƒ() -> guess the directory of the lib code
