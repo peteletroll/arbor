@@ -19,16 +19,12 @@ from subprocess import Popen, PIPE
 from datetime import datetime
 import shutil
 
-
 # your system configuration may vary...
 YUI_PATH = "uglifyjs"
-YUI_OPTIONS = "--compress --mangle"
-
-
-
-
-
-
+YUI_OPTIONS = [ "--compress", "--mangle" ]
+if len(sys.argv) > 1:
+    YUI_OPTIONS = sys.argv[1:]
+YUI_CMD = [ YUI_PATH ] + YUI_OPTIONS
 
 
 def make_lib():
@@ -111,7 +107,6 @@ def compile(js, title=None, padding=10):
   # if we don't have a cached copy of the compiler output for the file, 
   # run yui and save the raw output to the .o directory for later. otherwise
   # just return the text from the cached file.
-  yui_cmd = "%s %s" % (YUI_PATH,YUI_OPTIONS)
   if os.path.exists(js): 
     yui_input = open(js).read()
     title = os.path.basename(js)
@@ -121,7 +116,7 @@ def compile(js, title=None, padding=10):
 
   if True:
     print("+ "+title.replace('.js',''))
-    p = Popen(yui_cmd, shell=True, stdin=PIPE, stdout=PIPE, close_fds=True)
+    p = Popen(YUI_CMD, shell=False, stdin=PIPE, stdout=PIPE, close_fds=True)
     (pin, pout) = (p.stdin, p.stdout)
     pin.write(yui_input.encode("utf-8"))
     yui_output=p.communicate()[0].decode("utf-8").strip()
