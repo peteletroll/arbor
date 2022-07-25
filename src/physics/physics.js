@@ -4,7 +4,6 @@
 // the particle system itself. either run inline or in a worker (see worker.js)
 //
 
-"use strict";
   function Physics(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
     this.updateFn = updateFn
     this.bhTree = new BarnesHutTree() // for computing particle repulsion
@@ -151,8 +150,9 @@
       },
 
       tendParticles:function(){
-        for (var id in this.active.particles) {
-          var pt = this.active.particles[id];
+        var i, l = this.particles.length;
+        for (i = 0; i < l; i++) {
+          var pt = this.particles[i];
           // decay down any of the temporary mass increases that were passed along
           // by using an {_m:} instead of an {m:} (which is to say via a Node having
           // its .tempMass attr set)
@@ -184,8 +184,9 @@
 
       cacheForces:function() {
         // keep a snapshot of the current forces for the verlet integrator
-        for (var id in this.active.particles) {
-           var point = this.active.particles[id];
+        var i, l = this.particles.length;
+        for (i = 0; i < l; i++) {
+           var point = this.particles[i];
            point._F = point.f;
         }
       },
