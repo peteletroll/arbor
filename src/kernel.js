@@ -162,7 +162,6 @@
         var stillActive = that.system._updateBounds()
         if (_tween && _tween.busy()) stillActive = true
 
-        var render = that.system.renderer
         var now = Date.now()
         var render = that.system.renderer
         if (render!==undefined){
