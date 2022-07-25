@@ -100,9 +100,7 @@
             queue.push(oldParticle)
             queue.unshift(particle)
           }
-
         }
-
       },
 
       applyForces:function(particle, repulsion){
