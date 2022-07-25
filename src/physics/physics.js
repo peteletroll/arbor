@@ -196,17 +196,21 @@
         var l = this.particles.length;
         for (var i1 = 0; i1 < l; i1++) {
           var point1 = this.particles[i1];
+          var m1 = (point1._m||point1.m)
           for (var i2 = i1 + 1; i2 < l; i2++) {
               var point2 = this.particles[i2];
+              var m2 = (point2._m||point2.m)
+
               var d = point1.p.subtract(point2.p);
-              var distance = Math.max(1.0, d.magnitude());
-              var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
+              var m = d.magnitude();
+              var distance = Math.max(1.0, m);
+              var direction = (m > 0) ? d.divide(m) : Point.random(1).normalize()
 
               // apply force to each end point
               // (consult the cached `real' mass value if the mass is being poked to allow
               // for repositioning. the poked mass will still be used in .applyforce() so
               // all should be well)
-              var force = this.p.repulsion * (point1._m||point1.m) * (point2._m||point2.m)
+              var force = this.p.repulsion * m1 * m2
                 / (distance * distance);
               point1.applyForce(direction.multiply(force));
               point2.applyForce(direction.multiply(-force));
