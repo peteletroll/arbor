@@ -41,8 +41,10 @@
 
             if (p=='stiffness'){
               var stiff=param[p]
-              for (var id in this.active.springs) {
-                this.active.springs[id].k = stiff
+              this.checkLists()
+              var i, l = this.springs.length;
+              for (i = 0; i < l; i++) {
+                this.springs[i].k = stiff
               }
             }
           }
@@ -212,26 +214,27 @@
 
       applyBarnesHutRepulsion:function(){
         if (!this._bounds.topleft || !this._bounds.bottomright) return
-        // if (Object.keys(this.active.particles).length < 2) return
-        if (!objlt(this.active.particles, 2)) return
+	var i, l = this.particles.length;
+        if (l < 2) return
         var bottomright = this._bounds.bottomright.clone();
         var topleft = this._bounds.topleft.clone();
 
         // build a barnes-hut tree...
         this.bhTree.init(topleft, bottomright, this.p.theta)
-        for (var id in this.active.particles) {
-          this.bhTree.insert(this.active.particles[id]);
+        for (i = 0; i < l; i++) {
+          this.bhTree.insert(this.particles[i]);
         }
 
         // ...and use it to approximate the repulsion forces
-        for (var id in this.active.particles) {
-          this.bhTree.applyForces(this.active.particles[id], this.p.repulsion)
+        for (i = 0; i < l; i++) {
+          this.bhTree.applyForces(this.particles[i], this.p.repulsion)
         }
       },
 
       applySprings:function(){
-        for (var id in this.active.springs) {
-          var spring = this.active.springs[id];
+        var i, l = this.springs.length;
+        for (i = 0; i < l; i++) {
+          var spring = this.springs[i];
           var d = spring.point2.p.subtract(spring.point1.p); // the direction of the spring
           var displacement = spring.length - d.magnitude()//Math.max(.1, d.magnitude());
           var direction = ( (d.magnitude()>0) ? d : Point.random(1) ).normalize()
@@ -252,25 +255,24 @@
       applyCenterDrift:function(){
         // find the centroid of all the particles in the system and shift everything
         // so the cloud is centered over the origin
-        var numParticles = 0
+        var i, l = this.particles.length
+        if (l < 2) return
         var centroid = new Point(0,0)
-        for (var id in this.active.particles) {
-          centroid = centroid.add(this.active.particles[id].p)
-          numParticles++
+        for (i = 0; i < l; i++) {
+          centroid = centroid.add(this.particles[i].p)
         }
 
-        if (numParticles < 2) return
-
-        var correction = centroid.divide(-numParticles)
-        for (var id in this.active.particles) {
-          this.active.particles[id].applyForce(correction)
+        var correction = centroid.divide(-l)
+        for (i = 0; i < l; i++) {
+          this.particles[i].applyForce(correction)
         }
       },
 
       applyCenterGravity:function(){
         // attract each node to the origin
-        for (var id in this.active.particles) {
-          var point = this.active.particles[id];
+        var i, l = this.particles.length
+        for (i = 0; i < l; i++) {
+          var point = this.particles[i];
           var direction = point.p.multiply(-1.0);
           point.applyForce(direction.multiply(this.p.repulsion / 100.0));
         }
@@ -279,8 +281,9 @@
       updateVelocity:function(timestep){
         // translate forces to a new velocity for this particle
         var sum=0, max=0, n = 0;
-        for (var id in this.active.particles) {
-          var point = this.active.particles[id];
+        var i, l = this.particles.length;
+        for (i = 0; i < l; i++) {
+          var point = this.particles[i];
           if (point.fixed){
              point.v = new Point(0,0)
              point.f = new Point(0,0)
@@ -306,7 +309,6 @@
           n++
         }
         this._energy = {sum:sum, max:max, mean:sum/n, n:n}
-
       },
 
       updatePosition:function(timestep){
@@ -314,8 +316,9 @@
         var bottomright = null
         var topleft = null
 
-        for (var i in this.active.particles) {
-          var point = this.active.particles[i];
+        var i, l = this.particles.length;
+        for (i = 0; i < l; i++) {
+          var point = this.particles[i];
           // really force fixed point to stay fixed, to combat center drift effects
           if (point.fixed){
              point.v = new Point(0,0);
