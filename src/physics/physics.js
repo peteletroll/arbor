@@ -8,9 +8,8 @@
     this.updateFn = updateFn
     this.bhTree = new BarnesHutTree() // for computing particle repulsion
     this.active = {particles:{}, springs:{}}
-    this.free = {particles:{}}
-    this.particles = []
-    this.springs = []
+    this.particles = null
+    this.springs = null
     this._epoch=0
     this._energy = {sum:0, max:0, mean:0}
     this._bounds = {topleft:new Point(-1,-1), bottomright:new Point(1,1)}
@@ -49,6 +48,17 @@
         })
       },
 
+      checkLists:function(){
+        if (!this.particles){
+          this.particles = Object.values(this.active.particles);
+	  console.log("PARTICLES", this.particles);
+	}
+        if (!this.springs){
+          this.springs = Object.values(this.active.springs);
+	  console.log("SPRINGS", this.springs);
+	}
+      },
+
       addNode:function(c){
         var id = c.id
         var mass = c.m
@@ -59,17 +69,13 @@
                                      (c.y != null) ? c.y: this._bounds.topleft.y + h*Math.random())
         this.active.particles[id] = new Particle(randomish_pt, mass);
         this.active.particles[id].fixed = (c.f===1)
-        this.free.particles[id] = this.active.particles[id]
-        this.particles.push(this.active.particles[id])
+        this.particles = null
       },
 
       dropNode:function(c){
         var id = c.id
-        var dropping = this.active.particles[id]
-        var idx = this.particles.findIndex(function(e) { return e === dropping });
-        if (idx>-1) this.particles.splice(idx,1)
         delete this.active.particles[id]
-        delete this.free.particles[id]
+        this.particles = null
       },
 
       modifyNode:function(id, mods){
@@ -94,22 +100,13 @@
 
         if (from!==undefined && to!==undefined){
           this.active.springs[id] = new Spring(from, to, length, this.p.stiffness)
-          this.springs.push(this.active.springs[id])
-
-          delete this.free.particles[c.fm]
-          delete this.free.particles[c.to]
+          this.springs = null;
         }
       },
 
       dropSpring:function(c){
-        var id = c.id
-        var dropping = this.active.springs[id]
-
-        var idx = this.springs.findIndex(function(e) { return e === dropping });
-        if (idx>-1){
-           this.springs.splice(idx,1)
-        }
-        delete this.active.springs[id]
+        delete this.active.springs[c.id]
+        this.springs = null;
       },
 
       _update:function(changes){
@@ -120,6 +117,7 @@
       },
 
       tick:function(){
+        this.checkLists()
         this.tendParticles()
         var p = this.p
         if (p.integrator=='euler'){
