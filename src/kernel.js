@@ -163,7 +163,6 @@
         var stillActive = this.system._updateBounds()
         if (this.tween && this.tween.busy()) stillActive = true
 
-        var render = this.system.renderer
         var now = Date.now()
         var render = this.system.renderer
         if (render!==undefined){
