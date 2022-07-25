@@ -4,6 +4,7 @@
 // the particle system itself. either run inline or in a worker (see worker.js)
 //
 
+"use strict";
   function Physics(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
     this.updateFn = updateFn
     this.bhTree = new BarnesHutTree() // for computing particle repulsion
@@ -51,11 +52,11 @@
       checkLists:function(){
         if (!this.particles){
           this.particles = Object.values(this.active.particles);
-	  console.log("PARTICLES", this.particles);
+	  // console.log("PARTICLES", this.particles);
 	}
         if (!this.springs){
           this.springs = Object.values(this.active.springs);
-	  console.log("SPRINGS", this.springs);
+	  // console.log("SPRINGS", this.springs);
 	}
       },
 
@@ -188,11 +189,11 @@
       },
 
       applyBruteForceRepulsion:function(){
-        for (var id1 in this.active.particles) {
-          var point1 = this.active.particles[id1];
-          for (var id2 in this.active.particles) {
-            if (id1 < id2) { // don't compute the same force twice
-              var point2 = this.active.particles[id2];
+        var l = this.particles.length;
+        for (var i1 = 0; i1 < l; i1++) {
+          var point1 = this.particles[i1];
+          for (var i2 = i1 + 1; i2 < l; i2++) {
+              var point2 = this.particles[i2];
               var d = point1.p.subtract(point2.p);
               var distance = Math.max(1.0, d.magnitude());
               var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
@@ -205,7 +206,6 @@
                 / (distance * distance);
               point1.applyForce(direction.multiply(force));
               point2.applyForce(direction.multiply(-force));
-            }
           }
         }
       },
