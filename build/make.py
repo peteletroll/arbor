@@ -20,10 +20,9 @@ from datetime import datetime
 import shutil
 
 # your system configuration may vary...
-YUI_CMD = [ "uglifyjs", "--compress", "--mangle" ]
+UGLY_CMD = [ "uglifyjs", "--compress", "--mangle" ]
 if len(sys.argv) > 1:
-    YUI_CMD[1:] = sys.argv[1:]
-print("YUI_CMD", YUI_CMD)
+    UGLY_CMD[1:] = sys.argv[1:]
 
 
 def make_lib():
@@ -103,25 +102,25 @@ def compile(js, title=None, padding=10):
     return src
 
   if os.path.exists(js): 
-    yui_input = open(js).read()
+    ugly_input = open(js).read()
     title = os.path.basename(js)
   else: 
-    yui_input = js
-  yui_input = filter_src(yui_input, title)
+    ugly_input = js
+  ugly_input = filter_src(ugly_input, title)
 
   print("+ "+title.replace('.js',''))
   try:
-    p = Popen(YUI_CMD, shell=False, stdin=PIPE, stdout=PIPE, close_fds=True)
+    p = Popen(UGLY_CMD, shell=False, stdin=PIPE, stdout=PIPE, close_fds=True)
     (pin, pout) = (p.stdin, p.stdout)
-    pin.write(yui_input.encode("utf-8"))
-    yui_output=p.communicate()[0].decode("utf-8").strip()
+    pin.write(ugly_input.encode("utf-8"))
+    ugly_output=p.communicate()[0].decode("utf-8").strip()
 
     if title:
-      return "/* %s%s */  %s"%(" "*(padding-len(title)),title,yui_output)
+      return "/* %s%s */  %s"%(" "*(padding-len(title)),title,ugly_output)
     else:
-      return yui_output
+      return ugly_output
   except OSError as error:
-    raise Exception("%s: %s"%(" ".join(YUI_CMD),error))
+    raise Exception("%s: %s"%(" ".join(UGLY_CMD),error))
   
 
 def main():
