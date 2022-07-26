@@ -84,6 +84,11 @@ Queue.prototype = {
     this.length++;
     this.q[this.start] = e;
     return this;
+  },
+  at: function(i) {
+    if (i < 0)
+      i = this.length + i;
+    return (i >= 0 && i < this.length) ? this.q[this.start + i] : undefined
   }
 };
 
