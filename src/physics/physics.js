@@ -7,8 +7,8 @@
   var Physics = function(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
     var bhTree = BarnesHutTree() // for computing particle repulsion
     var active = {particles:{}, springs:{}}
-    var particles = []
-    var springs = []
+    var particles = null
+    var springs = null
     var _epoch=0
     var _energy = {sum:0, max:0, mean:0}
     var _bounds = {topleft:new Point(-1,-1), bottomright:new Point(1,1)}
@@ -47,6 +47,17 @@
         })
       },
 
+      checkLists:function(){
+        if (!particles){
+          particles = Object.values(active.particles);
+          console.log("PARTICLES", particles);
+        }
+        if (!springs){
+          springs = Object.values(active.springs);
+          console.log("SPRINGS", springs);
+        }
+      },
+
       addNode:function(c){
         var id = c.id
         var mass = c.m
@@ -56,18 +67,15 @@
         var randomish_pt = new Point((c.x != null) ? c.x: _bounds.topleft.x + w*Math.random(),
                                      (c.y != null) ? c.y: _bounds.topleft.y + h*Math.random())
 
-        
         active.particles[id] = new Particle(randomish_pt, mass);
         active.particles[id].fixed = (c.f===1)
-        particles.push(active.particles[id])        
+        particles = null
       },
 
       dropNode:function(c){
         var id = c.id
-        var dropping = active.particles[id]
-        var idx = particles.findIndex(function(e) { return e === dropping });
-        if (idx>-1) particles.splice(idx,1)
         delete active.particles[id]
+        particles = null
       },
 
       modifyNode:function(id, mods){
@@ -92,32 +100,24 @@
         
         if (from!==undefined && to!==undefined){
           active.springs[id] = new Spring(from, to, length, that.stiffness)
-          springs.push(active.springs[id])
+          springs = null
         }
       },
 
       dropSpring:function(c){
-        var id = c.id
-        var dropping = active.springs[id]
-        
-        var idx = springs.findIndex(function(e) { return e === dropping });
-        if (idx>-1){
-           springs.splice(idx,1)
-        }
-        delete active.springs[id]
+        delete active.springs[c.id]
+        springs = null
       },
 
       _update:function(changes){
         // batch changes phoned in (automatically) by a ParticleSystem
         _epoch++
-        
-        changes.forEach(function(c){
-          if (c.t in that) that[c.t](c)
-        })
+        changes.forEach((c) => that[c.t](c))
         return _epoch
       },
 
       tick:function(){
+        that.checkLists()
         that.tendParticles()
         if (that.integrator=='euler'){
           that.updateForces()
