@@ -4,6 +4,7 @@
 // the particle system itself. either run inline or in a worker (see worker.js)
 //
 
+  "use strict";
   var Physics = function(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
     var bhTree = BarnesHutTree() // for computing particle repulsion
     var active = {particles:{}, springs:{}}
@@ -190,8 +191,11 @@
         var l = particles.length;
         for (var i1 = 0; i1 < l; i1++) {
           var point1 = particles[i1];
+          var m1 = (point1._m||point1.m);
           for (var i2 = i1 + 1; i2 < l; i2++) {
               var point2 = particles[i2];
+              var m2 = (point2._m||point2.m);
+
               var d = point1.p.subtract(point2.p);
               var distance = Math.max(1.0, d.magnitude());
               var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
@@ -200,7 +204,7 @@
               // (consult the cached `real' mass value if the mass is being poked to allow
               // for repositioning. the poked mass will still be used in .applyforce() so
               // all should be well)
-              var force = that.repulsion * (point1._m||point1.m) * (point2._m||point2.m)
+              var force = that.repulsion * m1 * m2
                 / (distance * distance);
               point1.applyForce(direction.multiply(force));
               point2.applyForce(direction.multiply(-force));
