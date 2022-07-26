@@ -30,7 +30,7 @@
       },
 
       modifyPhysics:function(param){
-        checkLists();
+        that.checkLists();
         ['stiffness','repulsion','friction','gravity','dt','precision', 'integrator'].forEach(function(p){
           if (param[p]!==undefined){
             if (p=='precision'){
@@ -41,8 +41,8 @@
 
             if (p=='stiffness'){
               var stiff=param[p]
-              for (var id in active.springs) {
-                active.springs[id].k = stiff
+              for (var spring of springs) {
+                spring.k = stiff
               }
             }
           }
@@ -149,8 +149,7 @@
       },
 
       tendParticles:function(){
-        for (var id in active.particles) {
-          var pt = active.particles[id];
+        for (var pt of particles) {
           // decay down any of the temporary mass increases that were passed along
           // by using an {_m:} instead of an {m:} (which is to say via a Node having
           // its .tempMass attr set)
@@ -181,8 +180,7 @@
       
       cacheForces:function() {
         // keep a snapshot of the current forces for the verlet integrator
-        for (var id in active.particles) {
-           var point = active.particles[id];
+        for (var point of particles) {
            point._F = point.f;
         }
       },
@@ -221,19 +219,18 @@
 
         // build a barnes-hut tree...
         bhTree.init(topleft, bottomright, that.theta)        
-        for (var id in active.particles) {
-          bhTree.insert(active.particles[id]);
+        for (var point of particles) {
+          bhTree.insert(point);
         }
         
         // ...and use it to approximate the repulsion forces
-        for (var id in active.particles) {
-          bhTree.applyForces(active.particles[id], that.repulsion)
+        for (var point of particles) {
+          bhTree.applyForces(point, that.repulsion)
         }
       },
       
       applySprings:function(){
-        for (var id in active.springs) {
-          var spring = active.springs[id];
+        for (var spring of springs) {
           var d = spring.point2.p.subtract(spring.point1.p); // the direction of the spring
           var displacement = spring.length - d.magnitude()//Math.max(.1, d.magnitude());
           var direction = ( (d.magnitude()>0) ? d : Point.random(1) ).normalize()
@@ -256,23 +253,22 @@
         // so the cloud is centered over the origin
         var numParticles = 0
         var centroid = new Point(0,0)
-        for (var id in active.particles) {
-          centroid = centroid.add(active.particles[id].p)
+        for (var point of particles) {
+          centroid = centroid.add(point.p)
           numParticles++
         }
 
         if (numParticles < 2) return
         
         var correction = centroid.divide(-numParticles)
-        for (var id in active.particles) {
-          active.particles[id].applyForce(correction)
+        for (var point of particles) {
+          point.applyForce(correction)
         }
       },
 
       applyCenterGravity:function(){
         // attract each node to the origin
-        for (var id in active.particles) {
-          var point = active.particles[id];
+        for (var point of particles) {
           var direction = point.p.multiply(-1.0);
           point.applyForce(direction.multiply(that.repulsion / 100.0));
         }
@@ -281,8 +277,7 @@
       updateVelocity:function(timestep){
         // translate forces to a new velocity for this particle
         var sum=0, max=0, n = 0;
-        for (var id in active.particles) {
-          var point = active.particles[id];
+        for (var point of particles) {
           if (point.fixed){
              point.v = new Point(0,0)
              point.f = new Point(0,0)
@@ -315,8 +310,7 @@
         var bottomright = null
         var topleft = null        
         
-        for (var i in active.particles) {
-          var point = active.particles[i];
+        for (var point of particles) {
           // really force fixed point to stay fixed, to combat center drift effects
           if (point.fixed){
              point.v = new Point(0,0);
