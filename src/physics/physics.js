@@ -7,7 +7,6 @@
   var Physics = function(dt, stiffness, repulsion, friction, updateFn, integrator, precision){
     var bhTree = BarnesHutTree() // for computing particle repulsion
     var active = {particles:{}, springs:{}}
-    var free = {particles:{}}
     var particles = []
     var springs = []
     var _epoch=0
@@ -60,7 +59,6 @@
         
         active.particles[id] = new Particle(randomish_pt, mass);
         active.particles[id].fixed = (c.f===1)
-        free.particles[id] = active.particles[id]
         particles.push(active.particles[id])        
       },
 
@@ -70,7 +68,6 @@
         var idx = particles.findIndex(function(e) { return e === dropping });
         if (idx>-1) particles.splice(idx,1)
         delete active.particles[id]
-        delete free.particles[id]
       },
 
       modifyNode:function(id, mods){
@@ -96,9 +93,6 @@
         if (from!==undefined && to!==undefined){
           active.springs[id] = new Spring(from, to, length, that.stiffness)
           springs.push(active.springs[id])
-          
-          delete free.particles[c.fm]
-          delete free.particles[c.to]
         }
       },
 
