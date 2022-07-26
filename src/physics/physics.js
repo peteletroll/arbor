@@ -80,8 +80,8 @@
       },
 
       modifyNode:function(id, mods){
-        if (id in active.particles){
-          var pt = active.particles[id]
+        var pt = active.particles[id]
+        if (pt){
           if ('x' in mods) pt.p.x = mods.x
           if ('y' in mods) pt.p.y = mods.y
           if ('m' in mods) pt.m = mods.m
