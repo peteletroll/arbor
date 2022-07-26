@@ -4,6 +4,7 @@
 // run-loop manager for physics and tween updates
 //
     
+"use strict";
   function Kernel(pSystem){
     // in chrome, web workers aren't available to pages with file:// urls
     var chrome_local_file = window.location.protocol == "file:" &&
@@ -11,8 +12,7 @@
     this.USE_WORKER = (window.Worker !== undefined && !chrome_local_file && pSystem.parameters().worker)
     
     this._physics = null
-    this._fpsWindow = [] // for keeping track of the actual frame rate
-    this._fpsWindow.last = Date.now()
+    this.frames = new Queue()
     this._screenInterval = null
     this._attached = null
 
@@ -114,7 +114,13 @@
         this._lastPositions = data
         this._lastBounds = data.bounds
       },
-      
+
+      frame:function(){
+        var frames = this.frames;
+        frames.push(Date.now());
+        while (frames.length > 50)
+          frames.shift();
+      },
 
       // 
       // the main render loop when running in web worker mode
@@ -145,11 +151,7 @@
             if (this.tween) this.tween.tick()
             render.redraw()
 
-            var _fpsWindow = this._fpsWindow
-            var prevFrame = _fpsWindow.last
-            _fpsWindow.last = Date.now()
-            _fpsWindow.push(_fpsWindow.last-prevFrame)
-            if (_fpsWindow.length>50) _fpsWindow.shift()
+            this.frame()
           }
         }
       },
@@ -173,11 +175,7 @@
           render.redraw({timestamp:now})
         }
 
-        var _fpsWindow = this._fpsWindow
-        var prevFrame = _fpsWindow.last
-        _fpsWindow.last = now
-        _fpsWindow.push(_fpsWindow.last-prevFrame)
-        if (_fpsWindow.length>50) _fpsWindow.shift()
+        this.frame()
 
         // but stop the simulation when energy of the system goes below a threshold
         var sysEnergy = this._physics.systemEnergy()
@@ -197,18 +195,14 @@
         }
       },
 
-
       fps:function(newTargetFPS){
         if (newTargetFPS!==undefined){
           var timeout = 1000/Math.max(1,targetFps)
           this.physicsModified({timeout:timeout})
         }
         
-        var totInterv = 0
-        for (var i=0, j=this._fpsWindow.length; i<j; i++) totInterv+=this._fpsWindow[i]
-        var meanInterv = totInterv/Math.max(1,this._fpsWindow.length)
-        if (!isNaN(meanInterv)) return 1000/meanInterv
-        else return 0
+        var frames = this.frames
+	return 1000 * frames.length / (frames.at(-1) - frames.at(0))
       },
 
       // 
