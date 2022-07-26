@@ -12,8 +12,7 @@
     
     var _physics = null
     var _tween = null
-    var _fpsWindow = [] // for keeping track of the actual frame rate
-    _fpsWindow.last = Date.now()
+    var frames = new Queue();
     var _screenInterval = null
     var _attached = null
 
@@ -114,7 +113,12 @@
         that._lastPositions = data
         that._lastBounds = data.bounds
       },
-      
+
+      frame:function(){
+        frames.push(Date.now());
+        while (frames.length > 50)
+          frames.shift();
+      },
 
       // 
       // the main render loop when running in web worker mode
@@ -145,10 +149,7 @@
             if (_tween) _tween.tick()
             render.redraw()
 
-            var prevFrame = _fpsWindow.last
-            _fpsWindow.last = Date.now()
-            _fpsWindow.push(_fpsWindow.last-prevFrame)
-            if (_fpsWindow.length>50) _fpsWindow.shift()
+            that.frame()
           }
         }
       },
@@ -172,10 +173,7 @@
           render.redraw({timestamp:now})
         }
 
-        var prevFrame = _fpsWindow.last
-        _fpsWindow.last = now
-        _fpsWindow.push(_fpsWindow.last-prevFrame)
-        if (_fpsWindow.length>50) _fpsWindow.shift()
+        that.frame()
 
         // but stop the simulation when energy of the system goes below a threshold
         var sysEnergy = _physics.systemEnergy()
@@ -195,18 +193,13 @@
         }
       },
 
-
       fps:function(newTargetFPS){
         if (newTargetFPS!==undefined){
           var timeout = 1000/Math.max(1,targetFps)
           that.physicsModified({timeout:timeout})
         }
         
-        var totInterv = 0
-        for (var i=0, j=_fpsWindow.length; i<j; i++) totInterv+=_fpsWindow[i]
-        var meanInterv = totInterv/Math.max(1,_fpsWindow.length)
-        if (!isNaN(meanInterv)) return 1000/meanInterv
-        else return 0
+	return 1000 * frames.length / (frames.at(-1) - frames.at(0))
       },
 
       // 
