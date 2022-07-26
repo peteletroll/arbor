@@ -190,8 +190,9 @@
               var m2 = (point2._m||point2.m);
 
               var d = point1.p.subtract(point2.p);
-              var distance = Math.max(1.0, d.magnitude());
-              var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
+              var m = d.magnitude();
+              var distance = Math.max(1.0, m);
+              var direction = (m>0) ? d.divide(m) : Point.random(1).normalize()
 
               // apply force to each end point
               // (consult the cached `real' mass value if the mass is being poked to allow
@@ -223,12 +224,13 @@
           bhTree.applyForces(point, that.repulsion)
         }
       },
-      
+
       applySprings:function(){
         for (var spring of springs) {
           var d = spring.point2.p.subtract(spring.point1.p); // the direction of the spring
-          var displacement = spring.length - d.magnitude()//Math.max(.1, d.magnitude());
-          var direction = ( (d.magnitude()>0) ? d : Point.random(1) ).normalize()
+          var l = d.magnitude();
+          var displacement = spring.length - l //Math.max(.1, d.magnitude());
+          var direction = (l>0) ? d.divide(l) : Point.random(1).normalize()
 
           // BUG:
           // since things oscillate wildly for hub nodes, should probably normalize spring
@@ -286,9 +288,11 @@
           point.f.x = point.f.y = 0
 
           var speed = point.v.magnitude()          
-          if (speed>SPEED_LIMIT) point.v = point.v.divide(speed*speed)
+          if (speed>SPEED_LIMIT){
+            point.v = point.v.divide(speed*speed)
+            speed = 1 / speed
+          }
 
-          var speed = point.v.magnitude();
           var e = speed*speed
           sum += e
           max = Math.max(e,max)
