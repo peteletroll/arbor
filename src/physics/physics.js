@@ -29,6 +29,7 @@
       },
 
       modifyPhysics:function(param){
+        checkLists();
         ['stiffness','repulsion','friction','gravity','dt','precision', 'integrator'].forEach(function(p){
           if (param[p]!==undefined){
             if (p=='precision'){
@@ -50,11 +51,11 @@
       checkLists:function(){
         if (!particles){
           particles = Object.values(active.particles);
-          console.log("PARTICLES", particles);
+          // console.log("PARTICLES", particles);
         }
         if (!springs){
           springs = Object.values(active.springs);
-          console.log("SPRINGS", springs);
+          // console.log("SPRINGS", springs);
         }
       },
 
@@ -164,9 +165,7 @@
           // zero out the velocity from one tick to the next
           pt.v.x = pt.v.y = 0           
         }
-
       },
-      
       
       // Physics stuff      
       updateForces:function() {
@@ -188,11 +187,11 @@
       },
       
       applyBruteForceRepulsion:function(){
-        for (var id1 in active.particles) {
-          var point1 = active.particles[id1];
-          for (var id2 in active.particles) {
-            if (id1 < id2) { // don't compute the same force twice
-              var point2 = active.particles[id2];
+        var l = particles.length;
+        for (var i1 = 0; i1 < l; i1++) {
+          var point1 = particles[i1];
+          for (var i2 = i1 + 1; i2 < l; i2++) {
+              var point2 = particles[i2];
               var d = point1.p.subtract(point2.p);
               var distance = Math.max(1.0, d.magnitude());
               var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
@@ -205,7 +204,6 @@
                 / (distance * distance);
               point1.applyForce(direction.multiply(force));
               point2.applyForce(direction.multiply(-force));
-            }
           }
         }
       },
@@ -249,7 +247,6 @@
         }
       },
 
-
       applyCenterDrift:function(){
         // find the centroid of all the particles in the system and shift everything
         // so the cloud is centered over the origin
@@ -267,6 +264,7 @@
           active.particles[id].applyForce(correction)
         }
       },
+
       applyCenterGravity:function(){
         // attract each node to the origin
         for (var id in active.particles) {
@@ -352,7 +350,6 @@
         return _energy
       }
 
-      
     }
     return that.init()
   }
