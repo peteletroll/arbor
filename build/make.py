@@ -20,11 +20,9 @@ from datetime import datetime
 import shutil
 
 # your system configuration may vary...
-YUI_PATH = "uglifyjs"
-YUI_OPTIONS = [ "--compress", "--mangle" ]
+UGLY_CMD = [ "uglifyjs", "--compress", "--mangle" ]
 if len(sys.argv) > 1:
-    YUI_OPTIONS = sys.argv[1:]
-YUI_CMD = [ YUI_PATH ] + YUI_OPTIONS
+    UGLY_CMD[1:] = sys.argv[1:]
 
 
 def make_lib():
@@ -103,34 +101,26 @@ def compile(js, title=None, padding=10):
                   src)
     return src
 
-
-  # if we don't have a cached copy of the compiler output for the file, 
-  # run yui and save the raw output to the .o directory for later. otherwise
-  # just return the text from the cached file.
   if os.path.exists(js): 
-    yui_input = open(js).read()
+    ugly_input = open(js).read()
     title = os.path.basename(js)
   else: 
-    yui_input = js
-  yui_input = filter_src(yui_input, title)
+    ugly_input = js
+  ugly_input = filter_src(ugly_input, title)
 
-  if True:
-    print("+ "+title.replace('.js',''))
-    p = Popen(YUI_CMD, shell=False, stdin=PIPE, stdout=PIPE, close_fds=True)
+  print("+ "+title.replace('.js',''))
+  try:
+    p = Popen(UGLY_CMD, shell=False, stdin=PIPE, stdout=PIPE, close_fds=True)
     (pin, pout) = (p.stdin, p.stdout)
-    pin.write(yui_input.encode("utf-8"))
-    yui_output=p.communicate()[0].decode("utf-8").strip()
-    if not yui_output:
-      print("Compilation failed (%s)"%title)
-      sys.exit(1)
+    pin.write(ugly_input.encode("utf-8"))
+    ugly_output=p.communicate()[0].decode("utf-8").strip()
 
-
-
-  
-  if title:
-    return "/* %s%s */  %s"%(" "*(padding-len(title)),title,yui_output)
-  else:
-    return yui_output
+    if title:
+      return "/* %s%s */  %s"%(" "*(padding-len(title)),title,ugly_output)
+    else:
+      return ugly_output
+  except OSError as error:
+    raise Exception("%s: %s"%(" ".join(UGLY_CMD),error))
   
 
 def main():
