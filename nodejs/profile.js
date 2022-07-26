@@ -79,7 +79,7 @@ var file = argv.length > argp ? argv[argp] : "../demos/halfviz/library/the-myste
 var json = JSON.parse(gulp(file));
 var graph = Parseur().parse(json.src);
 
-var system = new ParticleSystem(opts);
+var system = arbor.ParticleSystem(opts);
 
 var start = Date.now();
 var last = start;
