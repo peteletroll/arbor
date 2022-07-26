@@ -10,7 +10,7 @@
     var particles = null
     var springs = null
     var _epoch=0
-    var _energy = {sum:0, max:0, mean:0}
+    var _energy = {sum:0, max:0, mean:0, n:0}
     var _bounds = {topleft:new Point(-1,-1), bottomright:new Point(1,1)}
 
     var SPEED_LIMIT = 1000 // the max particle velocity per tick
@@ -294,8 +294,7 @@
           max = Math.max(e,max)
           n++
         }
-        _energy = {sum:sum, max:max, mean:sum/n, n:n}
-        
+        _energy = {sum:sum, max:max, mean:(n>0 ? sum/n : 0), n:n}
       },
 
       updatePosition:function(timestep){
