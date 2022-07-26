@@ -251,16 +251,14 @@
       applyCenterDrift:function(){
         // find the centroid of all the particles in the system and shift everything
         // so the cloud is centered over the origin
-        var numParticles = 0
+        if (particles.length < 2) return
+
         var centroid = new Point(0,0)
         for (var point of particles) {
           centroid = centroid.add(point.p)
-          numParticles++
         }
 
-        if (numParticles < 2) return
-        
-        var correction = centroid.divide(-numParticles)
+        var correction = centroid.divide(particles.length)
         for (var point of particles) {
           point.applyForce(correction)
         }
