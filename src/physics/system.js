@@ -605,33 +605,33 @@
 
     def(Node.prototype, "p", {
       get: function() {
-        // trace("GETTER p");
+        // console.log("GETTER p");
         var self = this;
         var roboPoint = Object.create(Point.prototype);
         def(roboPoint, "x", {
           get: function() {
-            // trace("GETTER p.x");
+            // console.log("GETTER p.x");
             return self._p.x;
           },
           set: function(newX) {
-            // trace("SETTER p.x");
+            // console.log("SETTER p.x");
             state.kernel.particleModified(self._id, { x: newX });
           }
         });
         def(roboPoint, "y", {
           get: function() {
-            // trace("GETTER p.y");
+            // console.log("GETTER p.y");
             return self._p.y;
           },
           set: function(newY) {
-            // trace("SETTER p.y");
+            // console.log("SETTER p.y");
             state.kernel.particleModified(self._id, { y: newY });
           }
         });
         return roboPoint;
       },
       set: function(newP) {
-        // trace("SETTER p", newP);
+        // console.log("SETTER p", newP);
         this._p.x = newP.x;
         this._p.y = newP.y;
         state.kernel.particleModified(this._id, {x:newP.x, y:newP.y});
@@ -640,11 +640,11 @@
 
     def(Node.prototype, "mass", {
       get: function() {
-        // trace("GETTER mass");
+        // console.log("GETTER mass");
         return this._mass;
       },
       set: function(newM) {
-        // trace("SETTER mass", newM);
+        // console.log("SETTER mass", newM);
         this._mass = newM;
         state.kernel.particleModified(this._id, { m: newM });
       }
@@ -652,18 +652,18 @@
 
     def(Node.prototype, "tempMass", {
       set: function(newM) {
-        // trace("SETTER tempMass", newM);
+        // console.log("SETTER tempMass", newM);
         state.kernel.particleModified(this._id, { _m: newM });
       }
     });
 
     def(Node.prototype, "fixed", {
       get: function() {
-        // trace("GETTER fixed");
+        // console.log("GETTER fixed");
         return this._fixed;
       },
       set: function(isFixed) {
-        // trace("SETTER fixed", isFixed);
+        // console.log("SETTER fixed", isFixed);
         this._fixed = isFixed;
         state.kernel.particleModified(this._id, { f: isFixed ? 1 : 0 })
       }
