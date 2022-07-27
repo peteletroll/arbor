@@ -70,6 +70,10 @@ Queue.prototype = {
     this.q[this.start + this.length++] = e;
     return this;
   },
+  pushNow: function() {
+    this.q[this.start + this.length++] = Date.now();
+    return this;
+  },
   shift: function() {
     if (this.start > 512) {
       this.q.copyWithin(this.start - 512, this.start, this.start + this.length);

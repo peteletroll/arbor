@@ -115,7 +115,7 @@
       },
 
       frame:function(){
-        frames.push(Date.now());
+        frames.pushNow();
         while (frames.length > 50)
           frames.shift();
       },
