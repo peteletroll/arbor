@@ -8,11 +8,13 @@
 //  Copyright (c) 2011 Samizdat Drafting Co. All rights reserved.
 //
 
+  "use strict";
   var BarnesHutTree = function(){
     var _branches = []
     var _branchCtr = 0
     var _root = null
     var _theta = .5
+    var _repulsion = 0
     var queue = new Queue();
     
     var that = {
@@ -107,19 +109,18 @@
       applyForces:function(particle, repulsion){
         // find all particles/branch nodes this particle interacts with and apply
         // the specified repulsion to the particle
-        var pmass = particle._m || particle.m;
-        queue.empty().push(_root);
-        while (queue.length > 0){
-          var node = queue.shift()
-          if (node===undefined) continue
-          if (particle===node) continue
-          
+        _repulsion = repulsion;
+        this._applyForces(particle, _root)
+      },
+
+      _applyForces:function(particle, node){
+        if (node && particle !== node){
           if ('f' in node){
             // this is a particle leafnode, so just apply the force directly
             var d = particle.p.subtract(node.p);
             var distance = Math.max(1.0, d.magnitude());
             var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
-            var force = repulsion * pmass * (node._m||node.m) / (distance * distance);
+            var force = _repulsion * (particle._m||particle.m) * (node._m||node.m) / (distance * distance);
             particle.applyForce(direction.multiply(force));
           }else{
             // it's a branch node so decide if it's cluster-y and distant enough
@@ -131,16 +132,16 @@
             var size = Math.sqrt(node.size.x * node.size.y)
             if (size/dist > _theta){ // i.e., s/d > Θ
               // open the quad and recurse
-              queue.push(node.ne)
-              queue.push(node.nw)
-              queue.push(node.se)
-              queue.push(node.sw)
+              this._applyForces(particle, node.ne)
+              this._applyForces(particle, node.nw)
+              this._applyForces(particle, node.se)
+              this._applyForces(particle, node.sw)
             }else{
               // treat the quad as a single body
               var d = particle.p.subtract(node_p);
               var distance = Math.max(1.0, d.magnitude());
               var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
-              var force = repulsion * pmass * node.mass / (distance * distance);
+              var force = _repulsion * (particle._m||particle.m) * node.mass / (distance * distance);
               particle.applyForce(direction.multiply(force));
             }
           }
