@@ -114,6 +114,9 @@ def compile(js, title=None, padding=10):
     (pin, pout) = (p.stdin, p.stdout)
     pin.write(ugly_input.encode("utf-8"))
     ugly_output=p.communicate()[0].decode("utf-8").strip()
+    ec = p.returncode
+    if ec != 0:
+      raise Exception("%s exit code: %d"%(UGLY_CMD[0], ec))
 
     if title:
       return "/* %s%s */  %s"%(" "*(padding-len(title)),title,ugly_output)
