@@ -57,7 +57,6 @@ Spring.prototype.distanceToParticle = function(point)
   return Math.abs(ac.x * n.x + ac.y * n.y);
 };
 
-"use strict";
 var RateMeter = function(l) {
   if (isNaN(l))
     l = 50;
