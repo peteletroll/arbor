@@ -110,7 +110,7 @@
         // find all particles/branch nodes this particle interacts with and apply
         // the specified repulsion to the particle
         _repulsion = repulsion;
-        this._applyForces(particle, _root)
+        that._applyForces(particle, _root)
       },
 
       _applyForces:function(particle, node){
@@ -132,10 +132,10 @@
             var size = Math.sqrt(node.size.x * node.size.y)
             if (size/dist > _theta){ // i.e., s/d > Θ
               // open the quad and recurse
-              this._applyForces(particle, node.ne)
-              this._applyForces(particle, node.nw)
-              this._applyForces(particle, node.se)
-              this._applyForces(particle, node.sw)
+              that._applyForces(particle, node.ne)
+              that._applyForces(particle, node.nw)
+              that._applyForces(particle, node.se)
+              that._applyForces(particle, node.sw)
             }else{
               // treat the quad as a single body
               var d = particle.p.subtract(node_p);
