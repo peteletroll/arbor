@@ -8,7 +8,6 @@
 //  Copyright (c) 2011 Samizdat Drafting Co. All rights reserved.
 //
 
-  "use strict";
   var BarnesHutTree = function(){
     var _branches = []
     var _branchCtr = 0
