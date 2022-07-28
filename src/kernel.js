@@ -12,7 +12,7 @@
     
     var _physics = null
     var _tween = null
-    var frames = new Queue();
+    var rate = new RateMeter();
     var _screenInterval = null
     var _attached = null
 
@@ -114,12 +114,6 @@
         that._lastBounds = data.bounds
       },
 
-      frame:function(){
-        frames.pushNow();
-        while (frames.length > 50)
-          frames.shift();
-      },
-
       // 
       // the main render loop when running in web worker mode
       _lastFrametime:Date.now(),
@@ -149,7 +143,7 @@
             if (_tween) _tween.tick()
             render.redraw()
 
-            that.frame()
+            rate.tick()
           }
         }
       },
@@ -173,7 +167,7 @@
           render.redraw({timestamp:now})
         }
 
-        that.frame()
+        rate.tick()
 
         // but stop the simulation when energy of the system goes below a threshold
         var sysEnergy = _physics.systemEnergy()
@@ -199,7 +193,7 @@
           that.physicsModified({timeout:timeout})
         }
         
-	return 1000 * frames.length / (frames.at(-1) - frames.at(0))
+	return rate.rate()
       },
 
       // 

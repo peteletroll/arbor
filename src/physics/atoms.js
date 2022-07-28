@@ -57,42 +57,28 @@ Spring.prototype.distanceToParticle = function(point)
   return Math.abs(ac.x * n.x + ac.y * n.y);
 };
 
-var Queue = function() {
-  this.start = this.length = 0;
-  this.q = new Array(1024);
-}
-Queue.prototype = {
-  empty: function() {
-    this.start = this.length = 0;
+"use strict";
+var RateMeter = function(l) {
+  if (isNaN(l))
+    l = 50;
+  this.buf = new Array(Math.max(4, l));
+  this.ptr = 0;
+  this.len = 0;
+};
+RateMeter.prototype = {
+  tick: function() {
+    this.buf[this.ptr++] = Date.now();
+    this.ptr %= this.buf.length;
+    this.len = Math.min(this.buf.length, this.len + 1);
     return this;
   },
-  push: function(e) {
-    this.q[this.start + this.length++] = e;
-    return this;
-  },
-  pushNow: function() {
-    this.q[this.start + this.length++] = Date.now();
-    return this;
-  },
-  shift: function() {
-    if (this.start > 512) {
-      this.q.copyWithin(this.start - 512, this.start, this.start + this.length);
-      this.start -= 512;
-    }
-    this.length--;
-    return this.q[this.start++];
-  },
-  unshift: function(e) {
-    if (--this.start < 0)
-      throw "can't unshift";
-    this.length++;
-    this.q[this.start] = e;
-    return this;
-  },
-  at: function(i) {
-    if (i < 0)
-      i = this.length + i;
-    return (i >= 0 && i < this.length) ? this.q[this.start + i] : undefined
+  rate: function() {
+    if (this.len < 2)
+      return NaN;
+    var l = this.buf.length;
+    var t1 = this.buf[(this.ptr + l - this.len) % l];
+    var t2 = this.buf[(this.ptr + l - 1) % l];
+    return 1000 * this.len / (t2 - t1);
   }
 };
 
