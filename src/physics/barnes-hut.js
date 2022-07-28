@@ -30,11 +30,11 @@
       
       insert:function(newParticle){
         // add a particle to the tree, starting at the current _root and working down
-        var node = _root
-        queue.empty().push(newParticle);
+        that._insert(newParticle, _root)
+      },
 
-        while (queue.length){
-          var particle = queue.shift()
+      _insert:function(particle, node){
+        if (particle){
           var p_mass = particle._m || particle.m
           var p_quad = that._whichQuad(particle, node)
 
@@ -47,16 +47,13 @@
             }else{
               node.p = particle.p.multiply(p_mass)
             }
-            
           }else if ('origin' in node[p_quad]){
-            // slot contains a branch node, keep iterating with the branch
+            // slot contains a branch node, recurse with the branch
             // as our new root
-            node.mass += (p_mass)
+            node.mass += p_mass
             if (node.p) node.p = node.p.add(particle.p.multiply(p_mass))
             else node.p = particle.p.multiply(p_mass)
-            
-            node = node[p_quad]
-            queue.unshift(particle)
+            that._insert(particle, node[p_quad]);
           }else{
             // slot contains a particle, create a new branch and recurse with
             // both points in the queue now
@@ -98,12 +95,10 @@
 
             // keep iterating but now having to place both the current particle and the
             // one we just replaced with the branch node
-            queue.push(oldParticle)
-            queue.unshift(particle)
+            that._insert(oldParticle, node)
+            that._insert(particle, node)
           }
-
         }
-
       },
 
       applyForces:function(particle, repulsion){
