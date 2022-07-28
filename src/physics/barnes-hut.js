@@ -15,7 +15,6 @@
     var _root = null
     var _theta = .5
     var _repulsion = 0
-    var queue = new Queue();
     
     var that = {
       init:function(topleft, bottomright, theta){
@@ -56,7 +55,7 @@
             that._insert(particle, node[p_quad]);
           }else{
             // slot contains a particle, create a new branch and recurse with
-            // both points in the queue now
+            // both points
             var branch_size = node.size.divide(2)
 
             // if we let a zero-sized node through, we'll end up infinitely bisecting it
