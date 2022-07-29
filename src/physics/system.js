@@ -31,7 +31,7 @@
     }
 
     // param validation and defaults
-    if (integrator!='verlet' && integrator!='euler') integrator='verlet'
+    if (integrator!='euler') integrator='verlet'
     friction = isNaN(friction) ? .5 : friction
     repulsion = isNaN(repulsion) ? 1000 : repulsion
     targetFps = isNaN(targetFps) ? 55 : targetFps

@@ -16,7 +16,7 @@
     var SPEED_LIMIT = 1000 // the max particle velocity per tick
     
     var that = {
-      integrator:['verlet','euler'].indexOf(integrator)>=0 ? integrator : 'verlet',
+      integrator:integrator == 'euler' ? integrator : 'verlet',
       stiffness:(stiffness!==undefined) ? stiffness : 1000,
       repulsion:(repulsion!==undefined)? repulsion : 600,
       friction:(friction!==undefined)? friction : .3,
