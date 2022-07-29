@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>
+      The Barnes-Hut Algorithm
+    </title>
+    <meta name="generator" content="TextMate http://macromates.com/">
+    <meta name="author" content="Christian Swinehart"><!-- Date: 2011-01-15 -->
+
+    <script type="text/javascript" src="http://use.typekit.com/mxh7kqd.js">
+</script>
+    <script type="text/javascript">
+try{Typekit.load();}catch(e){}
+    </script>
+    <link rel="stylesheet" href="../_/ref.css" type="text/css" charset="utf-8">
+  </head>
+  <body>
+    <div id="doc">
+      <div id="titleblock">
+        <h1>The Barnes-Hut Algorithm</h1>
+        <p>Tom Ventimiglia &amp; Kevin Wayne</p>        
+      </div>
+
+    <p>The crucial idea in speeding up the brute force n-body algorithm is to group nearby bodies and approximate them as a single body. If the group is sufficiently far away, we can approximate its gravitational effects by using its <em>center of mass</em>. The center of mass of a group of bodies is the average position of a body in that group, weighted by mass. Formally, if two bodies have positions (<code>x1</code>, <code>y1</code>) and (<code>x2</code>, <code>y2</code>), and masses <code>m1</code> and <code>m2</code>, then their total mass and center of mass (<code>x</code>, <code>y</code>) are given by:</p>
+    
+    <blockquote class="short">
+      <div class="math">
+        m = m1 + m2<br>
+        x = (x1*m1 + x2*m2) / m<br>
+        y = (y1*m1 + y2*m2) / m
+      </div>
+    </blockquote>
+    <p>The <em>Barnes-Hut algorithm</em> is a clever scheme for grouping together bodies that are sufficiently nearby. It recursively divides the set of bodies into groups by storing them in a <em>quad-tree</em>. A quad-tree is similar to a binary tree, except that each node has 4 children (some of which may be empty). Each node represents a region of the two dimensional space.</p>
+    <p>The topmost node represents the whole space, and its four children represent the four quadrants of the space. As shown in the diagram, the space is recursively subdivided into quadrants until each subdivision contains 0 or 1 bodies (some regions do not have bodies in all of their quadrants. Hence, some internal nodes have less than 4 non-empty children). 
+      <p><img style="margin-left:70px;" src="img/example-space.png"></p>
+      
+      Each external node represents a single body. Each internal node represents the group of bodies beneath it, and stores the center-of-mass and the total mass of all its children bodies. Here is an example with 8 bodies:</p>
+    <p><img src="img/example-tree.png"></p>
+    <p>To calculate the net force on a particular body, traverse the nodes of the tree, starting from the root. If the center-of-mass of an internal node is sufficiently far from the body, approximate the bodies contained in that part of the tree as a single body, whose position is the group’s center of mass and whose mass is the group’s total mass. The algorithm is fast because we don’t need to individually examine any of the bodies in the group.</p>
+    <p>If the internal node is not sufficiently far from the body, recursively traverse each of its subtrees. To determine if a node is sufficiently far away, compute the quotient <em>s / d</em>, where <em>s</em> is the width of the region represented by the internal node, and <em>d</em> is the distance between the body and the node’s center-of-mass. Then, compare this ratio against a threshold value θ. If <em>s / d</em> &lt; θ, then the internal node is sufficiently far away. By adjusting the θ parameter, we can change the speed and accuracy of the simulation. We will always use θ = 0.5, a value commonly used in practice. Note that if θ = 0, then no internal node is treated as a single body, and the algorithm degenerates to brute force.</p>
+    <h2>Constructing the Barnes-Hut tree</h2> 
+      <p>To construct the Barnes-Hut tree, insert the bodies one after another. To insert a body <em>b</em> into the tree rooted at node <em>x</em>, use the following recursive procedure:</p>
+    <ol style="margin-left:2em;">
+      <li>If node <em>x</em> does not contain a body, put the new body <em>b</em> here.</li>
+      <li>If node <em>x</em> is an internal node, update the center-of-mass and total mass of <em>x</em>. Recursively insert the body <em>b</em> in the appropriate quadrant.</li>
+      <li>If node <em>x</em> is an external node, say containing a body named <em>c</em>, then there are two bodies <em>b</em> and <em>c</em> in the same region. Subdivide the region further by creating four children. Then, recursively insert both <em>b</em> and <em>c</em> into the appropriate quadrant(s). Since <em>b</em> and <em>c</em> may still end up in the same quadrant, there may be several subdivisions during a single insertion. Finally, update the center-of-mass and total mass of <em>x</em>.</li>
+    </ol>
+    <p>As an example, consider the 5 bodies in the diagram below. In our examples, we use the convention that the branches, from left to right, represent the northwest, northeast, southwest, and southeast quadrants, respectively. The tree goes through the following stages as the bodies are inserted:</p>
+    <img style="margin-left:-230px" src="img/tree-building.png">
+    <p>The root node contains the center-of-mass and total mass of all five bodies. The two other internal nodes each contain the center-of-mass and total mass of the bodies <em>b</em>, <em>c</em>, and <em>d</em>.</p>
+
+    <h2>Calculating the force acting on a body</h2>
+    <p>To calculate the net force acting on body <em>b</em>, use the following recursive procedure, starting with the root of the quad-tree:</p>
+    <ol style="margin-left:2em;">
+      <li>If the current node is an external node (and it is not body <em>b</em>), calculate the force exerted by the current node on <em>b</em>, and add this amount to <em>b</em>’s net force.</li>
+      <li>Otherwise, calculate the ratio s/d. If s/d &lt; θ, treat this internal node as a single body, and calculate the force it exerts on body <em>b</em>, and add this amount to <em>b</em>’s net force.</li>
+      <li>Otherwise, run the procedure recursively on each of the current node’s children.</li>
+    </ol>
+    <p>As an example, to calculate the net force acting on body <em>a</em>, we start at the root node, which is an internal node. It represents the center-of-mass of the six bodies <em>a</em>, <em>b</em>, <em>c</em>, <em>d</em>, <em>e</em>, and <em>f</em>, which have masses 1, 2, 3, 4, 5, and 6&nbsp;kg, respectively.</p> 
+    <p>The force calculation proceeds as follows:</p>
+    <ol>
+      <li>The first node examined is the root. Comparing body A to the node’s center of mass (white dot), the quotient s/d = 100/43.1 &gt; θ = 0.5, so we perform the process recursively on each of the root’s children.</li>
+      <img src="img/force-01.png">
+      <li>The first child is body <em>a</em> itself. A node does not exert force on itself, so we don’t do anything.</li>
+      <img src="img/force-02.png">
+      <li>This child represents the northeast quadrant of the space, and contains the center-of-mass of bodies <em>b</em>, <em>c</em>, <em>d</em>, and <em>e</em>. Now s/d = 50/62.7 &gt; θ so we recursively calculate the force exerted by the node’s first non-empty child.</li>
+      <img src="img/force-03.png">
+      <li>This is also an internal node, representing the northeast quadrant of its parent, and containing the center-of-mass of bodies <em>b</em>, <em>c</em>, and <em>d</em>. Now s/d = 25/66.9 &lt; &theta;. Treating the internal node as a single body whose mass is the sum of the masses of <em>b</em>, <em>c</em>, and <em>d</em>, we calculate the force exerted on body <em>a</em>, and add this value to the net force exerted on <em>a</em>. Since the parent of this node has no more children, we continue examining the other children of the root.</li>
+      <img src="img/force-04.png">
+      <li>The next child is the one containing body <em>e</em>. This is an external node, so we calculate the pairwise force between <em>a</em> and <em>e</em>, and add this to <em>a</em>’s net force.</li>
+      <img src="img/force-05.png">
+      
+      <li>Having examined all the siblings at this level, we move on to the next sibling of the parent.
+        This brings us to the node containing body <em>f</em>. Since it is an external node we calculate
+        the pairwise force between <em>a</em> and <em>f</em>, and add this to <em>a</em>’s net force.</li>
+      <img src="img/force-06.png">
+      
+    </ol>
+    <div id='attrib'>
+      <p>Text: adapted from <a href="http://www.cs.princeton.edu/courses/archive/fall03/cs126/assignments/barnes-hut.html">COS126: Barnes-Hut Galaxy Simulator</a> (2003)<br>Diagrams: <a href="http://samizdat.cc">Samzidat Drafting Co.</a> (2011)</p>
+    </div>
+
+    </div>
+  </body>
+</html>
