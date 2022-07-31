@@ -289,8 +289,8 @@
 
           var speed = point.v.magnitude()          
           if (speed>SPEED_LIMIT){
-            point.v = point.v.divide(speed*speed)
-            speed = 1 / speed
+            point.v = point.v.multiply(SPEED_LIMIT/speed)
+            speed = SPEED_LIMIT
           }
 
           var e = speed*speed
