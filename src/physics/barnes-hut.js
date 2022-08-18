@@ -111,19 +111,21 @@
           if ('f' in node){
             // this is a particle leafnode, so just apply the force directly
             var d = particle.p.subtract(node.p);
-            var distance = Math.max(1.0, d.magnitude());
-            var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
+            var distance = d.magnitude();
+            var direction = ((distance>0) ? d : Point.random(1)).normalize()
+            distance = Math.max(1.0, distance);
             var force = _repulsion * (particle._m||particle.m) * (node._m||node.m) / (distance * distance);
             particle.applyForce(direction.multiply(force));
           }else{
             // it's a branch node so decide if it's cluster-y and distant enough
             // to summarize as a single point. if it's too complex, open it and deal
             // with its quadrants in turn
-            // remember that node.p = Σ pᵢmᵢ, actual position is node.p / node.mass
+            // remember that node.p = Σ pᵢmᵢ, actual COM position is node.p / node.mass
             var node_p = node.p.divide(node.mass);
-            var dist = particle.p.subtract(node_p).magnitude()
+            var d = particle.p.subtract(node_p);
+            var distance = d.magnitude();
             var size = Math.sqrt(node.size.x * node.size.y)
-            if (size/dist > _theta){ // i.e., s/d > Θ
+            if (size/distance > _theta){ // i.e., s/d > Θ
               // open the quad and recurse
               that._applyForces(particle, node.ne)
               that._applyForces(particle, node.nw)
@@ -131,9 +133,8 @@
               that._applyForces(particle, node.sw)
             }else{
               // treat the quad as a single body
-              var d = particle.p.subtract(node_p);
-              var distance = Math.max(1.0, d.magnitude());
-              var direction = ((d.magnitude()>0) ? d : Point.random(1)).normalize()
+              var direction = ((distance>0) ? d : Point.random(1)).normalize()
+              distance = Math.max(1.0, distance);
               var force = _repulsion * (particle._m||particle.m) * node.mass / (distance * distance);
               particle.applyForce(direction.multiply(force));
             }
