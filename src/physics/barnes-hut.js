@@ -107,7 +107,7 @@
       },
 
       _applyForces:function(particle, node){
-        if (node && particle !== node){
+        if (node !== undefined && particle !== node){
           if ('f' in node){
             // this is a particle leafnode, so just apply the force directly
             var d = particle.p.subtract(node.p);
