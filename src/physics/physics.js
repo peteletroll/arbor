@@ -218,7 +218,7 @@
         for (var point of particles) {
           bhTree.insert(point);
         }
-        
+        bhTree.postInsert();
         // ...and use it to approximate the repulsion forces
         for (var point of particles) {
           bhTree.applyForces(point, that.repulsion)

@@ -99,6 +99,15 @@
         }
       },
 
+      postInsert:function(){
+        // now node.p = Σ pᵢmᵢ, actual COM position is node.p / node.mass
+        for (var i = 0; i < _branchCtr; i++) {
+          var node = _branches[i];
+          node.p = node.p.divide(node.mass);
+        }
+        // now node.p = actual COM position
+      },
+
       applyForces:function(particle, repulsion){
         // find all particles/branch nodes this particle interacts with and apply
         // the specified repulsion to the particle
@@ -120,9 +129,7 @@
             // it's a branch node so decide if it's cluster-y and distant enough
             // to summarize as a single point. if it's too complex, open it and deal
             // with its quadrants in turn
-            // remember that node.p = Σ pᵢmᵢ, actual COM position is node.p / node.mass
-            var node_p = node.p.divide(node.mass);
-            var d = particle.p.subtract(node_p);
+            var d = particle.p.subtract(node.p);
             var distance = d.magnitude();
             var size = Math.sqrt(node.size.x * node.size.y)
             if (size/distance > _theta){ // i.e., s/d > Θ
