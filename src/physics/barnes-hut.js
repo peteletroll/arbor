@@ -104,6 +104,7 @@
         for (var i = 0; i < _branchCtr; i++) {
           var node = _branches[i];
           node.p = node.p.divide(node.mass);
+          node.s = Math.sqrt(node.size.x * node.size.y);
         }
         // now node.p = actual COM position
       },
@@ -131,8 +132,7 @@
             // with its quadrants in turn
             var d = particle.p.subtract(node.p);
             var distance = d.magnitude();
-            var size = Math.sqrt(node.size.x * node.size.y)
-            if (size/distance > _theta){ // i.e., s/d > Θ
+            if (node.s/distance > _theta){ // i.e., s/d > Θ
               // open the quad and recurse
               that._applyForces(particle, node.ne)
               that._applyForces(particle, node.nw)
@@ -169,10 +169,10 @@
           var branch = _branches[_branchCtr]
           branch.ne = branch.nw = branch.se = branch.sw = undefined
           branch.mass = 0
-          branch.p = undefined
+          branch.p = branch.s = undefined
         }else{
           branch = {origin:null, size:null, 
-                    nw:undefined, ne:undefined, sw:undefined, se:undefined, mass:0, p:undefined}
+                    nw:undefined, ne:undefined, sw:undefined, se:undefined, mass:0, p:undefined, s:undefined}
           _branches[_branchCtr] = branch
         }
 
