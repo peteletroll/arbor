@@ -281,7 +281,7 @@
           }
 
           if (that.integrator=='euler'){
-            point.v = point.v.add(point.f.multiply(timestep)).multiply(1-that.friction);
+            point.v = point.v.add(point.f.divide(point.m).multiply(timestep)).multiply(1-that.friction);
           }else{
             point.v = point.v.add(point.f.add(point._F.divide(point.m)).multiply(timestep*0.5)).multiply(1-that.friction);
           }

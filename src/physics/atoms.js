@@ -39,7 +39,7 @@ var Particle = function(position, mass){
 };
 
 Particle.prototype.applyForce = function(force){
-	this.f = this.f.add(force.divide(this.m));
+	this.f = this.f.add(force);
 };
 
 var Spring = function(point1, point2, length, k)
