@@ -264,8 +264,7 @@
       applyCenterGravity:function(){
         // attract each node to the origin
         for (var point of particles) {
-          var direction = point.p.multiply(-1.0);
-          point.applyForce(direction.multiply(that.repulsion / 100.0));
+          point.applyForce(point.p.multiply(that.repulsion / -100.0));
         }
       },
       
