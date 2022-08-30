@@ -318,8 +318,7 @@
           }else{
             //this should follow the equation
             //x(t+1) = x(t) + v(t) * timestep + 1/2 * timestep^2 * a(t)
-            var accel = point.f.multiply(0.5 * timestep * timestep).divide(point.m);
-            point.p = point.p.add(point.v.multiply(timestep)).add(accel);
+            point.p = point.p.add(point.v.multiply(timestep)).add(point.f.multiply(0.5 * timestep * timestep / (point._m||point.m)));
           }
           
           if (!bottomright){
